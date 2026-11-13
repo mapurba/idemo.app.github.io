@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apurba Mondal (@mapurba) — idemo.app | 3D Games &amp; Enterprise Ecosystem</title>
+  <meta name="description" content="Official 3D portfolio of Apurba Mondal (@mapurba) and idemo.app (www.idemo.app). Explore WebGL games on game.idemo.app, AI Agents, Enterprise IAM, and Micro-Frontends on GitHub." />
+
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+ <!-- <script src="https://cdn.tailwindcss.com"></script>
+  -->
+  <link href="./output.css" rel="stylesheet">
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#06080f',
+            alabaster: '#f8fafc',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Theme Tokens */
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --accent-primary: #4f46e5;
+      --accent-secondary: #0d9488;
+      --glass-bg: rgba(255, 255, 255, 0.76);
+      --glass-border: rgba(15, 23, 42, 0.08);
+      --glass-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+      --glow-color: rgba(79, 70, 229, 0.14);
+      --card-hover-border: rgba(79, 70, 229, 0.42);
+    }
+
+    html.dark {
+      --bg-primary: #06080f;
+      --bg-secondary: #0d111c;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-primary: #00f0ff;
+      --accent-secondary: #8b5cf6;
+      --glass-bg: rgba(13, 17, 28, 0.68);
+      --glass-border: rgba(255, 255, 255, 0.09);
+      --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.68);
+      --glow-color: rgba(0, 240, 255, 0.12);
+      --card-hover-border: rgba(0, 240, 255, 0.48);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-x: hidden;
+    }
+
+    /* Fullscreen Fixed 3D WebGL Background */
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Ambient Cursor Spotlight */
+    #cursor-glow {
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Glassmorphic Surfaces */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: background 0.5s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease-out;
+    }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transform-style: preserve-3d;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.5s ease;
+    }
+
+    .glass-card:hover {
+      border-color: var(--card-hover-border);
+    }
+
+    /* Gradient Typography */
+    .gradient-text-dark {
+      background: linear-gradient(135deg, #00f0ff 0%, #8b5cf6 50%, #38bdf8 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientFlow 6s ease infinite;
+    }
+
+    .gradient-text-light {
+      background: linear-gradient(135deg, #4f46e5 0%, #0d9488 50%, #2563eb 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientFlow 6s ease infinite;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Scroll Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Marquee */
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marqueeScroll 36s linear infinite;
+    }
+
+    .marquee-track:hover {
+      animation-play-state: paused;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.35); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.55); }
+  </style>
+</head>
+<body class="antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- Interactive Three.js WebGL Background -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Subtle Cursor Ambient Spotlight -->
+  <div id="cursor-glow" class="hidden md:block"></div>
+
+  <!-- Toast Notification Banner (No alert() used) -->
+  <div id="toast-banner" class="fixed bottom-6 right-6 z-50 hidden items-center gap-2.5 px-4 py-3 rounded-2xl glass-panel border border-indigo-500/40 dark:border-cyan-400/40 text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300">
+    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+    <span id="toast-message">Copied to clipboard!</span>
+  </div>
+
+  <!-- Main Content Wrapper -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+
+    <!-- Sticky Glassmorphic Navigation Bar -->
+    <header class="sticky top-0 z-40 px-4 sm:px-6 lg:px-8 pt-4">
+      <nav class="max-w-7xl mx-auto glass-panel rounded-2xl px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+        <!-- Brand & Developer Identity -->
+        <a href="#" class="flex items-center gap-3 group focus:outline-none">
+          <div class="relative w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-600 to-teal-500 dark:from-cyan-400 dark:to-violet-600 shadow-lg transition-transform duration-300 group-hover:scale-105">
+            <svg class="w-5 h-5 text-white dark:text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
+              <line x1="12" y1="22" x2="12" y2="15.5"></line>
+              <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-display font-bold text-lg tracking-tight leading-none">
+              idemo<span class="text-indigo-600 dark:text-cyan-400">.app</span>
+            </span>
+            <span class="text-[11px] font-medium tracking-wider opacity-70 mt-0.5">
+              Apurba Mondal &bull; @mapurba
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden lg:flex items-center gap-7 text-sm font-medium">
+          <a href="#ecosystem" onclick="filterProjects('all')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">Repositories</a>
+          <a href="#ecosystem" onclick="filterProjects('ai')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">AI &amp; Agents</a>
+          <a href="#ecosystem" onclick="filterProjects('enterprise')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">Enterprise &amp; IAM</a>
+          <a href="#ecosystem" onclick="filterProjects('games')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">Games &amp; 3D</a>
+          <a href="#github-profile" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">GitHub &amp; Orgs</a>
+        </div>
+
+        <!-- Right Controls: GitHub Profile, Theme Toggle & Game Portal CTA -->
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <!-- Direct GitHub Link -->
+          <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer" aria-label="Apurba Mondal on GitHub"
+            class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-300/60 dark:border-white/10 bg-white/60 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-xs font-semibold transition-all duration-300">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            <span class="hidden sm:inline">@mapurba</span>
+          </a>
+
+          <!-- Dark / Light Mode Toggle -->
+          <button id="theme-toggle" type="button" aria-label="Toggle Dark and Light Mode"
+            class="p-2.5 rounded-xl border border-slate-300/60 dark:border-white/10 bg-white/60 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400">
+            <!-- Sun Icon (Dark Mode) -->
+            <svg id="icon-sun" class="w-5 h-5 text-amber-300 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </svg>
+            <!-- Moon Icon (Light Mode) -->
+            <svg id="icon-moon" class="w-5 h-5 text-indigo-600 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Primary Game Portal CTA -->
+          <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white dark:text-slate-950 bg-indigo-600 hover:bg-indigo-700 dark:bg-cyan-400 dark:hover:bg-cyan-300 shadow-md shadow-indigo-500/20 dark:shadow-cyan-400/20 transition-all duration-300 hover:-translate-y-0.5">
+            <span>game.idemo.app</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
+            </svg>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+
+      <!-- Hero Section -->
+      <section class="relative pt-12 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+          <!-- Left Hero Copy -->
+          <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <!-- Developer & Domain Badge -->
+            <div class="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2.5 px-4 py-1.5 rounded-full glass-panel text-xs font-semibold tracking-wide">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 dark:bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500 dark:bg-cyan-400"></span>
+              </span>
+              <span>Apurba Mondal (<a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer" class="underline decoration-indigo-500 dark:decoration-cyan-400">@mapurba</a>) &bull; OpenText &bull; www.idemo.app</span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
+              Building <span class="gradient-text-light dark:gradient-text-dark">AI Agents</span>, <span class="gradient-text-light dark:gradient-text-dark">Enterprise IAM</span> &amp; <span class="gradient-text-light dark:gradient-text-dark">3D Web Games</span>
+            </h1>
+
+            <!-- Bio & Ecosystem Summary -->
+            <p class="text-base sm:text-lg opacity-80 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Welcome to <strong>idemo.app</strong> (<a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer" class="underline decoration-indigo-500 dark:decoration-cyan-400 underline-offset-4 font-medium">www.idemo.app</a>), the engineering hub of <strong>Apurba Mondal</strong>. Explore browser-native games hosted at <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer" class="underline decoration-teal-500 dark:decoration-cyan-400 underline-offset-4 font-medium">game.idemo.app</a> alongside 71+ open-source and enterprise repositories spanning LLM copilots, NetIQ Identity drivers, RBAC engines, and micro-frontends.
+            </p>
+
+            <!-- Hero Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+              <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-semibold text-sm text-white dark:text-slate-950 bg-gradient-to-r from-indigo-600 to-teal-600 dark:from-cyan-400 dark:to-violet-500 shadow-xl shadow-indigo-600/20 dark:shadow-cyan-500/20 hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+                  <path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></path>
+                </svg>
+                <span>Launch game.idemo.app</span>
+              </a>
+
+              <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold text-sm glass-panel hover:border-indigo-500/50 dark:hover:border-cyan-400/50 transition-all duration-300 hover:-translate-y-0.5">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+                <span>github.com/mapurba</span>
+              </a>
+
+              <a href="#ecosystem"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold text-sm glass-panel hover:border-teal-500/50 dark:hover:border-violet-400/50 transition-all duration-300 hover:-translate-y-0.5">
+                <span>Browse Repos</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </a>
+            </div>
+
+            <!-- Real GitHub Telemetry Metrics -->
+            <div class="grid grid-cols-3 gap-3 sm:gap-5 pt-3 max-w-xl mx-auto lg:mx-0">
+              <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer" class="glass-panel rounded-2xl p-3.5 sm:p-4 text-center lg:text-left hover:border-indigo-500/40 dark:hover:border-cyan-400/40 transition-all">
+                <div class="font-display font-bold text-xl sm:text-2xl text-indigo-600 dark:text-cyan-400">71+</div>
+                <div class="text-xs opacity-70 mt-0.5">GitHub Repos</div>
+              </a>
+              <a href="https://github.com/mapurba?tab=stars" target="_blank" rel="noopener noreferrer" class="glass-panel rounded-2xl p-3.5 sm:p-4 text-center lg:text-left hover:border-teal-500/40 dark:hover:border-violet-400/40 transition-all">
+                <div class="font-display font-bold text-xl sm:text-2xl text-teal-600 dark:text-violet-400">79+</div>
+                <div class="text-xs opacity-70 mt-0.5">Stars &amp; Pro Badges</div>
+              </a>
+              <div class="glass-panel rounded-2xl p-3.5 sm:p-4 text-center lg:text-left">
+                <div class="font-display font-bold text-xl sm:text-2xl text-indigo-600 dark:text-cyan-400">5 Orgs</div>
+                <div class="text-xs opacity-70 mt-0.5">Ecosystem Hubs</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Interactive 3D Kinetic Sculpture & GitHub Quick-Access HUD -->
+          <div class="lg:col-span-5 flex justify-center">
+            <div class="glass-panel rounded-3xl p-6 sm:p-7 w-full max-w-md space-y-5 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                  <span class="w-3 h-3 rounded-full bg-amber-400/80"></span>
+                  <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                </div>
+                <span class="text-xs font-mono opacity-60">THREE.JS // KINETIC_CORE</span>
+              </div>
+
+              <!-- 3D Kinetic Sculpture Controls -->
+              <div class="rounded-2xl p-4 sm:p-5 bg-slate-900/5 dark:bg-white/[0.03] border border-slate-900/5 dark:border-white/5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold uppercase tracking-wider opacity-75">3D Sculpture Controls</span>
+                  <span id="theme-badge-label" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-500/15 text-indigo-600 dark:bg-cyan-400/15 dark:text-cyan-300">
+                    Obsidian Cyber
+                  </span>
+                </div>
+                <p class="text-xs opacity-75 leading-relaxed">
+                  Move cursor to orbit the 3D gyroscope or trigger kinetic modes below.
+                </p>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <button id="btn-mode-orbit" type="button" onclick="setSculptureMode('orbit')"
+                    class="sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 transition-all">
+                    Orbit Mode
+                  </button>
+                  <button id="btn-mode-pulse" type="button" onclick="setSculptureMode('pulse')"
+                    class="sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-700 dark:bg-cyan-400/10 dark:hover:bg-cyan-400/20 dark:text-cyan-300 transition-all">
+                    Pulse Core
+                  </button>
+                  <button id="btn-mode-hyperspin" type="button" onclick="setSculptureMode('hyperspin')"
+                    class="sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-teal-600/10 hover:bg-teal-600/20 text-teal-700 dark:bg-violet-500/15 dark:hover:bg-violet-500/25 dark:text-violet-300 transition-all">
+                    Hyper-Spin
+                  </button>
+                  <button id="btn-kinetic-burst" type="button" onclick="triggerKineticBurst()"
+                    class="py-2 px-3 rounded-xl text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:bg-amber-400/15 dark:hover:bg-amber-400/25 dark:text-amber-300 transition-all">
+                    Kinetic Burst
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick GitHub Handle & Portal Links -->
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] border border-slate-900/5 dark:border-white/5">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center bg-slate-900 text-white dark:bg-white dark:text-slate-950">
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                      </svg>
+                    </div>
+                    <div class="truncate">
+                      <div class="text-sm font-semibold truncate">github.com/mapurba</div>
+                      <div class="text-xs opacity-65 truncate">Apurba Mondal (@mapurba)</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <button type="button" onclick="copyText('https://github.com/mapurba', 'Copied https://github.com/mapurba')" title="Copy GitHub URL"
+                      class="p-2 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 text-xs font-semibold transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                    </button>
+                    <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1.5 rounded-xl bg-indigo-600/15 dark:bg-cyan-400/15 text-indigo-600 dark:text-cyan-300 text-xs font-semibold hover:opacity-85 transition-opacity">
+                      Open
+                    </a>
+                  </div>
+                </div>
+
+                <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+                  class="flex items-center justify-between p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:bg-white/80 dark:hover:bg-white/[0.08] border border-transparent hover:border-teal-500/30 dark:hover:border-cyan-400/30 transition-all group">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-cyan-400/15 dark:text-cyan-400">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">game.idemo.app</div>
+                      <div class="text-xs opacity-65">Hosted Web Games &amp; 3D Demos</div>
+                    </div>
+                  </div>
+                  <span class="text-xs font-semibold text-teal-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">Play &rarr;</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tech Stack & Open-Source Marquee -->
+      <section class="py-5 border-y border-slate-900/5 dark:border-white/5 glass-panel overflow-hidden">
+        <div class="marquee-track flex items-center gap-9 text-xs sm:text-sm font-semibold tracking-wider uppercase opacity-75">
+          <span>local-copilot (TypeScript)</span>
+          <span>&bull;</span>
+          <span>agent-flow-public</span>
+          <span>&bull;</span>
+          <span>policy-slm</span>
+          <span>&bull;</span>
+          <span>netiq-driver-dtd</span>
+          <span>&bull;</span>
+          <span>RBAC Policy Engine (Java)</span>
+          <span>&bull;</span>
+          <span>DEAD-EARTH (Unity C#)</span>
+          <span>&bull;</span>
+          <span>IGI-2-Covert-Strike-Android</span>
+          <span>&bull;</span>
+          <span>angular-dynamic-forms</span>
+          <span>&bull;</span>
+          <span>Three.js &amp; WebGL2</span>
+          <span>&bull;</span>
+          <!-- Duplicate for seamless loop -->
+          <span>local-copilot (TypeScript)</span>
+          <span>&bull;</span>
+          <span>agent-flow-public</span>
+          <span>&bull;</span>
+          <span>policy-slm</span>
+          <span>&bull;</span>
+          <span>netiq-driver-dtd</span>
+          <span>&bull;</span>
+          <span>RBAC Policy Engine (Java)</span>
+          <span>&bull;</span>
+          <span>DEAD-EARTH (Unity C#)</span>
+          <span>&bull;</span>
+          <span>IGI-2-Covert-Strike-Android</span>
+          <span>&bull;</span>
+          <span>angular-dynamic-forms</span>
+          <span>&bull;</span>
+          <span>Three.js &amp; WebGL2</span>
+          <span>&bull;</span>
+        </div>
+      </section>
+
+      <!-- Prominent GitHub Developer Profile & Organizations Card -->
+      <section id="github-profile" class="pt-16 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="reveal glass-panel rounded-3xl p-6 sm:p-9 lg:p-10 relative overflow-hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+            <!-- Profile Bio & Achievements -->
+            <div class="lg:col-span-7 space-y-5">
+              <div class="flex flex-wrap items-center gap-4">
+                <!-- Stylized Monogram Avatar -->
+                <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-600 via-violet-600 to-teal-500 dark:from-cyan-400 dark:via-blue-500 dark:to-violet-600 text-white dark:text-slate-950 font-display font-bold text-2xl shadow-xl">
+                  AM
+                </div>
+                <div>
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-tight">Apurba Mondal</h2>
+                    <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-indigo-500/15 text-indigo-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:underline">
+                      @mapurba
+                    </a>
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300 border border-amber-500/25">
+                      GitHub Pro
+                    </span>
+                  </div>
+                  <p class="text-xs sm:text-sm opacity-75 mt-1">
+                    Software Engineer at <strong>OpenText</strong> &bull; Creator of <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer" class="underline">www.idemo.app</a> &amp; <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer" class="underline">game.idemo.app</a> &bull; UTC +05:30
+                  </p>
+                </div>
+              </div>
+
+              <!-- Quick Copy / Open Bar -->
+              <div class="flex flex-wrap items-center gap-2.5">
+                <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white dark:text-slate-950 bg-slate-900 dark:bg-white hover:opacity-90 transition-opacity">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>Visit github.com/mapurba</span>
+                </a>
+
+                <button type="button" onclick="copyText('@mapurba', 'Copied handle @mapurba')"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-cyan-400/15 transition-colors">
+                  <span>Copy @mapurba</span>
+                </button>
+
+                <button type="button" onclick="copyText('https://github.com/mapurba', 'Copied https://github.com/mapurba')"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-cyan-400/15 transition-colors">
+                  <span>Copy Profile URL</span>
+                </button>
+
+                <a href="https://github.com/mapurba/idemo.app.github.io" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-teal-500/15 text-teal-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:opacity-85 transition-opacity">
+                  <span>Source: idemo.app.github.io &nearr;</span>
+                </a>
+              </div>
+
+              <!-- GitHub Achievements -->
+              <div class="space-y-2">
+                <div class="text-[11px] font-semibold uppercase tracking-wider opacity-65">GitHub Achievements</div>
+                <div class="flex flex-wrap gap-2">
+                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                    Arctic Code Vault Contributor
+                  </a>
+                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                    Pull Shark x2
+                  </a>
+                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                    Pair Extraordinaire
+                  </a>
+                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                    Quickdraw
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Organizations & Key Repositories -->
+            <div class="lg:col-span-5 space-y-4">
+              <div class="p-5 rounded-2xl bg-slate-900/5 dark:bg-white/[0.03] border border-slate-900/5 dark:border-white/5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold uppercase tracking-wider opacity-75">GitHub Organizations</span>
+                  <span class="text-xs font-mono opacity-60">5 Active Orgs</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <a href="https://github.com/workspacer-in" target="_blank" rel="noopener noreferrer"
+                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
+                    @workspacer-in &nearr;
+                  </a>
+                  <a href="https://github.com/lastday-in" target="_blank" rel="noopener noreferrer"
+                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500/10 text-teal-700 dark:bg-violet-500/15 dark:text-violet-300 hover:bg-teal-500/20 dark:hover:bg-violet-500/25 transition-colors">
+                    @lastday-in &nearr;
+                  </a>
+                  <a href="https://github.com/lstdays" target="_blank" rel="noopener noreferrer"
+                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500/10 text-teal-700 dark:bg-violet-500/15 dark:text-violet-300 hover:bg-teal-500/20 dark:hover:bg-violet-500/25 transition-colors">
+                    @lstdays &nearr;
+                  </a>
+                  <a href="https://github.com/dynamic-components" target="_blank" rel="noopener noreferrer"
+                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
+                    @dynamic-components &nearr;
+                  </a>
+                  <a href="https://github.com/agentflow-stage" target="_blank" rel="noopener noreferrer"
+                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
+                    @agentflow-stage &nearr;
+                  </a>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer"
+                  class="p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:border-indigo-500/40 dark:hover:border-cyan-400/40 border border-transparent transition-all">
+                  <div class="font-display font-bold text-lg text-indigo-600 dark:text-cyan-400">71 Repositories</div>
+                  <div class="opacity-70 mt-0.5">Explore all on GitHub &rarr;</div>
+                </a>
+                <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+                  class="p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:border-teal-500/40 dark:hover:border-violet-400/40 border border-transparent transition-all">
+                  <div class="font-display font-bold text-lg text-teal-600 dark:text-violet-400">game.idemo.app</div>
+                  <div class="opacity-70 mt-0.5">Live WebGL Arcade &rarr;</div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Ecosystem & GitHub Repositories Showcase -->
+      <section id="ecosystem" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="reveal text-center max-w-3xl mx-auto space-y-4 mb-10">
+          <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 dark:bg-cyan-400/10 dark:text-cyan-400">
+            github.com/mapurba &bull; idemo.app
+          </span>
+          <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
+            Featured <span class="gradient-text-light dark:gradient-text-dark">Repositories</span> &amp; Apps
+          </h2>
+          <p class="text-sm sm:text-base opacity-75">
+            Filter across AI Agents, Enterprise Identity &amp; IAM, 3D Web/Unity Games, and Micro-Frontends — or search by repository name, language, or stack.
+          </p>
+        </div>
+
+        <!-- Filter Tabs + Live Search Bar -->
+        <div class="reveal flex flex-col lg:flex-row items-center justify-between gap-4 mb-8">
+          <!-- Category Filter Tabs -->
+          <div class="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl glass-panel w-full lg:w-auto" role="tablist">
+            <button type="button" data-filter="all" onclick="filterProjects('all')"
+              class="filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 shadow-sm">
+              All (20)
+            </button>
+            <button type="button" data-filter="ai" onclick="filterProjects('ai')"
+              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+              AI &amp; Agents (8)
+            </button>
+            <button type="button" data-filter="enterprise" onclick="filterProjects('enterprise')"
+              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+              Enterprise &amp; IAM (6)
+            </button>
+            <button type="button" data-filter="games" onclick="filterProjects('games')"
+              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+              Games &amp; 3D (3)
+            </button>
+            <button type="button" data-filter="microfrontends" onclick="filterProjects('microfrontends')"
+              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+              Micro-Frontends (3)
+            </button>
+          </div>
+
+          <!-- Live Search Input -->
+          <div class="relative w-full lg:w-80">
+            <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="repo-search" type="text" placeholder="Search repos (e.g. local-copilot, RBAC, C#)..."
+              oninput="handleSearchInput(this.value)"
+              class="w-full pl-10 pr-4 py-2.5 rounded-2xl glass-panel text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 transition-all" />
+          </div>
+        </div>
+
+        <!-- Project Cards Grid -->
+        <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Populated dynamically by JavaScript -->
+        </div>
+
+        <!-- Empty Search Fallback -->
+        <div id="empty-search-state" class="hidden text-center py-14 glass-panel rounded-3xl mt-6 space-y-3">
+          <div class="font-display text-xl font-bold">No matching repositories found</div>
+          <p class="text-sm opacity-75">Try another keyword or explore all 71 repositories directly on GitHub.</p>
+          <div class="pt-2 flex justify-center gap-3">
+            <button type="button" onclick="resetFilters()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950">
+              Reset Filters
+            </button>
+            <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer"
+              class="px-4 py-2 rounded-xl text-xs font-semibold glass-panel">
+              Browse github.com/mapurba &nearr;
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Engineering Pillars Bento Section -->
+      <section id="architecture" class="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="reveal mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div class="space-y-2.5 max-w-2xl">
+            <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-teal-500/10 text-teal-600 dark:bg-violet-500/15 dark:text-violet-300">
+              Engineering Pillars
+            </span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">
+              From Autonomous LLM Agents to 3D Game Worlds
+            </h2>
+          </div>
+          <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+            class="text-xs sm:text-sm font-semibold text-indigo-600 dark:text-cyan-400 hover:underline">
+            Explore full commit graph on github.com/mapurba &rarr;
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <!-- Pillar 1 -->
+          <div class="reveal md:col-span-6 glass-panel rounded-3xl p-7 flex flex-col justify-between space-y-5">
+            <div class="flex items-center justify-between">
+              <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-indigo-500/15 text-indigo-600 dark:bg-cyan-400/15 dark:text-cyan-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4z"></path>
+                </svg>
+              </div>
+              <a href="https://github.com/mapurba/local-copilot" target="_blank" rel="noopener noreferrer" class="text-xs font-mono opacity-70 hover:opacity-100 underline">
+                mapurba/local-copilot &nearr;
+              </a>
+            </div>
+            <div class="space-y-2">
+              <h3 class="font-display text-xl font-bold">Local-First AI Copilots &amp; Agentic Workflows</h3>
+              <p class="text-sm opacity-75 leading-relaxed">
+                Privacy-preserving local LLM assistants (<code>local-copilot</code>, <code>ollamaApp</code>), structured extraction engines (<code>langextract</code>), and policy-aware small language models (<code>policy-slm</code>, <code>agent-flow-public</code>).
+              </p>
+            </div>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="reveal md:col-span-6 glass-panel rounded-3xl p-7 flex flex-col justify-between space-y-5">
+            <div class="flex items-center justify-between">
+              <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-violet-500/20 dark:text-violet-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <a href="https://github.com/mapurba/RBAC" target="_blank" rel="noopener noreferrer" class="text-xs font-mono opacity-70 hover:opacity-100 underline">
+                mapurba/RBAC &nearr;
+              </a>
+            </div>
+            <div class="space-y-2">
+              <h3 class="font-display text-xl font-bold">Enterprise Identity, Drivers &amp; Access Governance</h3>
+              <p class="text-sm opacity-75 leading-relaxed">
+                Production-grade identity synchronization and policy enforcement built with <code>netiq-driver-dtd</code>, <code>driverforge</code>, Java policy-based <code>RBAC</code>, and resilient retry interceptors.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact & Collaboration Section -->
+      <section id="contact" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="reveal glass-panel rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-6 space-y-5">
+            <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 dark:bg-cyan-400/10 dark:text-cyan-400">
+              Connect with @mapurba
+            </span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">
+              Collaborate on Enterprise Apps, AI Agents, or 3D Games
+            </h2>
+            <p class="text-sm sm:text-base opacity-75 leading-relaxed">
+              Reach out directly to <strong>Apurba Mondal</strong> via GitHub or send a message below to discuss enterprise software engineering, identity integrations, or interactive experiences on <strong>www.idemo.app</strong>.
+            </p>
+
+            <div class="space-y-3 pt-1 text-sm">
+              <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-3 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+                <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-900/10 dark:bg-white/10">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                </span>
+                <span>GitHub: <strong>https://github.com/mapurba</strong></span>
+              </a>
+
+              <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-3 hover:text-teal-600 dark:hover:text-cyan-400 transition-colors">
+                <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-cyan-400/15 dark:text-cyan-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </span>
+                <span>Games Arcade: <strong>https://game.idemo.app/</strong></span>
+              </a>
+
+              <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-3 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+                <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-500/15 text-indigo-600 dark:bg-violet-500/20 dark:text-violet-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path></svg>
+                </span>
+                <span>Primary Domain: <strong>https://www.idemo.app</strong></span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Contact Form -->
+          <div class="lg:col-span-6">
+            <form id="contact-form" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="name" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Your Name</label>
+                  <input type="text" id="name" required placeholder="Jane Doe"
+                    class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all" />
+                </div>
+                <div>
+                  <label for="email" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Email Address</label>
+                  <input type="email" id="email" required placeholder="jane@organization.com"
+                    class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all" />
+                </div>
+              </div>
+
+              <div>
+                <label for="topic" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Inquiry Area</label>
+                <select id="topic"
+                  class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-slate-900/90 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all">
+                  <option value="Enterprise Software & IAM">Enterprise Software &amp; Identity Management</option>
+                  <option value="AI Agents & Local Copilots">AI Agents, SLMs &amp; Local Copilots</option>
+                  <option value="WebGL & 3D Games">WebGL &amp; 3D Games (game.idemo.app)</option>
+                  <option value="Open Source Collaboration">Open Source Collaboration (@mapurba)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="message" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Message</label>
+                <textarea id="message" rows="3" required placeholder="Share your project idea, repository question, or collaboration scope..."
+                  class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all"></textarea>
+              </div>
+
+              <button type="submit"
+                class="w-full py-3.5 px-6 rounded-xl font-semibold text-sm text-white dark:text-slate-950 bg-indigo-600 hover:bg-indigo-700 dark:bg-cyan-400 dark:hover:bg-cyan-300 shadow-lg shadow-indigo-500/20 dark:shadow-cyan-400/20 transition-all duration-300 hover:-translate-y-0.5">
+                Send Message to Apurba Mondal
+              </button>
+
+              <div id="form-feedback" class="hidden p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-medium">
+                Message recorded! You can also open an issue or discussion directly at <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer" class="underline font-bold">github.com/mapurba</a>.
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900/10 dark:border-white/10 glass-panel mt-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-600 to-teal-500 dark:from-cyan-400 dark:to-violet-600 text-white dark:text-slate-950 font-display font-bold text-sm">
+            AM
+          </div>
+          <div>
+            <div class="font-display font-bold text-sm">Apurba Mondal (@mapurba) &bull; idemo.app</div>
+            <div class="text-xs opacity-65">&copy; 2026 www.idemo.app &bull; Hosted via <a href="https://github.com/mapurba/idemo.app.github.io" target="_blank" rel="noopener noreferrer" class="underline">mapurba/idemo.app.github.io</a></div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-5 text-xs sm:text-sm font-medium opacity-85">
+          <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">GitHub (@mapurba)</a>
+          <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">game.idemo.app</a>
+          <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">www.idemo.app</a>
+          <a href="#ecosystem" class="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">Repositories</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Interactive Repository & App Detail Modal -->
+  <div id="project-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md transition-opacity duration-300" aria-modal="true" role="dialog">
+    <div class="glass-panel rounded-3xl max-w-xl w-full p-6 sm:p-8 relative shadow-2xl border border-white/15 transform transition-all duration-300 scale-95 opacity-0" id="modal-dialog">
+      <button type="button" onclick="closeModal()" aria-label="Close modal"
+        class="absolute top-5 right-5 p-2 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div id="modal-content" class="space-y-5">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Data, Interactive UI & Three.js 3D Kinetic Engine -->
+  <script>
+    // =========================================================================
+    // 1. REAL GITHUB REPOSITORIES & APPS FOR APURBA MONDAL (@mapurba)
+    // =========================================================================
+    const PROJECTS = [
+      // --- AI & AGENTS (8) ---
+      {
+        id: 'local-copilot',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'local-copilot',
+        tagline: 'Privacy-First Local AI Coding Copilot',
+        visibility: 'Public',
+        language: 'TypeScript',
+        description: 'Local-first AI coding assistant engineered in TypeScript to run private code completions and chat workflows without external cloud telemetry.',
+        stack: ['TypeScript', 'Local LLM', 'IDE Extension', 'Streaming'],
+        githubUrl: 'https://github.com/mapurba/local-copilot',
+        demoUrl: 'https://github.com/mapurba/local-copilot',
+        demoLabel: 'Explore Source'
+      },
+      {
+        id: 'agent-flow-public',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'agent-flow-public',
+        tagline: 'Visual Multi-Agent Workflow Orchestrator',
+        visibility: 'Public',
+        language: 'TypeScript',
+        description: 'Node-based orchestration framework for designing, chaining, and executing autonomous AI agent pipelines with deterministic state routing.',
+        stack: ['TypeScript', 'Agentic AI', 'DAG Engine', 'React'],
+        githubUrl: 'https://github.com/mapurba/agent-flow-public',
+        demoUrl: 'https://github.com/agentflow-stage',
+        demoLabel: 'Org: @agentflow-stage'
+      },
+      {
+        id: 'policy-slm',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'policy-slm',
+        tagline: 'Small Language Model Governance & Policy Engine',
+        visibility: 'Public',
+        language: 'HTML / AI',
+        description: 'Interactive policy evaluation interface and guardrail harness designed for compact Small Language Models (SLMs) in regulated enterprise workflows.',
+        stack: ['SLM', 'Policy Guardrails', 'HTML/JS', 'Compliance'],
+        githubUrl: 'https://github.com/mapurba/policy-slm',
+        demoUrl: 'https://github.com/mapurba/policy-slm',
+        demoLabel: 'Inspect Policy SLM'
+      },
+      {
+        id: 'ilm-agent',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'ilm-agent',
+        tagline: 'Identity Lifecycle Management Autonomous Agent',
+        visibility: 'Private / Showcase',
+        language: 'Python',
+        description: 'Intelligent Python agent automating Identity Lifecycle Management (ILM) provisioning reviews, entitlement audits, and anomaly triage.',
+        stack: ['Python', 'Identity Governance', 'LLM Agents', 'Automation'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba?tab=repositories',
+        demoLabel: 'View @mapurba Profile'
+      },
+      {
+        id: 'langextract',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'langextract',
+        tagline: 'Structured Entity & Schema Extraction Engine',
+        visibility: 'Private / Showcase',
+        language: 'Python',
+        description: 'High-precision Python pipeline for transforming unstructured enterprise documents into validated JSON schemas using LLM-guided extraction.',
+        stack: ['Python', 'NLP', 'Structured Output', 'JSON Schema'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba?tab=repositories',
+        demoLabel: 'View @mapurba Profile'
+      },
+      {
+        id: 'ollamaApp',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'ollamaApp',
+        tagline: 'Local Ollama Model Runner & Prompt Studio',
+        visibility: 'Private / Showcase',
+        language: 'Python',
+        description: 'Lightweight Python wrapper and workbench for orchestrating local Ollama weights, RAG context injection, and rapid prompt benchmarking.',
+        stack: ['Python', 'Ollama', 'Local Inference', 'RAG'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba?tab=repositories',
+        demoLabel: 'View @mapurba Profile'
+      },
+      {
+        id: 'reviewAi',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'reviewAi',
+        tagline: 'Automated Pull Request & Code Quality Reviewer',
+        visibility: 'Private / Showcase',
+        language: 'TypeScript',
+        description: 'TypeScript static-plus-LLM code review assistant that analyzes diffs for security regressions, edge cases, and architectural consistency.',
+        stack: ['TypeScript', 'AST Analysis', 'CI/CD', 'LLM Review'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba?tab=repositories',
+        demoLabel: 'View @mapurba Profile'
+      },
+      {
+        id: 'zero-to-agents',
+        category: 'ai',
+        categoryLabel: 'AI & Agents',
+        title: 'zero-to-agents',
+        tagline: 'Foundational Agentic Architecture & Fine-Tuning Labs',
+        visibility: 'Public / Research',
+        language: 'Jupyter Notebook',
+        description: 'Comprehensive notebooks covering tool-calling agents, Meta-Llama-3 fine-tuning (Meta-Llama3-Fine-Tuning), and deep learning fundamentals.',
+        stack: ['Jupyter', 'PyTorch', 'Llama-3', 'Tool Use'],
+        githubUrl: 'https://github.com/mapurba/Meta-Llama3-Fine-Tuning',
+        demoUrl: 'https://github.com/mapurba/da-225o-deep-learning',
+        demoLabel: 'Deep Learning Repo'
+      },
+
+      // --- ENTERPRISE & IAM (6) ---
+      {
+        id: 'rbac',
+        category: 'enterprise',
+        categoryLabel: 'Enterprise & IAM',
+        title: 'RBAC',
+        tagline: 'Policy-Based Roles & Resources Management Engine',
+        visibility: 'Public',
+        language: 'Java',
+        description: 'Enterprise Java access-control engine implementing fine-grained Role-Based Access Control (RBAC), hierarchical permissions, and dynamic policy checks.',
+        stack: ['Java', 'Access Control', 'Policy Engine', 'Security'],
+        githubUrl: 'https://github.com/mapurba/RBAC',
+        demoUrl: 'https://github.com/mapurba/RBAC',
+        demoLabel: 'View RBAC Repo'
+      },
+      {
+        id: 'fetch-interceptor-retrycalls',
+        category: 'enterprise',
+        categoryLabel: 'Enterprise & IAM',
+        title: 'fetch-interceptor-retrycalls',
+        tagline: 'Resilient HTTP Interceptor & Exponential Backoff',
+        visibility: 'Public (MIT)',
+        language: 'JavaScript',
+        description: 'Zero-dependency JavaScript fetch middleware providing automatic token refresh hooks, configurable retry policies, and transient fault recovery.',
+        stack: ['JavaScript', 'HTTP Middleware', 'Resilience', 'MIT License'],
+        githubUrl: 'https://github.com/mapurba/fetch-interceptor-retrycalls',
+        demoUrl: 'https://github.com/mapurba/fetch-interceptor-retrycalls',
+        demoLabel: 'View Package Source'
+      },
+      {
+        id: 'netiq-driver-dtd',
+        category: 'enterprise',
+        categoryLabel: 'Enterprise & IAM',
+        title: 'netiq-driver-dtd',
+        tagline: 'NetIQ Identity Manager Driver & DTD Tooling',
+        visibility: 'Enterprise / IAM',
+        language: 'Python',
+        description: 'Specialized Python tooling and XML/DTD validation suite for NetIQ Identity Manager drivers, DirXML policy transformations, and schema checks.',
+        stack: ['Python', 'NetIQ IDM', 'DirXML / DTD', 'Enterprise IAM'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba/xmllint-wasm',
+        demoLabel: 'Related: xmllint-wasm'
+      },
+      {
+        id: 'driverforge',
+        category: 'enterprise',
+        categoryLabel: 'Enterprise & IAM',
+        title: 'driverforge',
+        tagline: 'Enterprise Connector & Driver Scaffolding Studio',
+        visibility: 'Enterprise / IAM',
+        language: 'TypeScript',
+        description: 'TypeScript developer toolkit accelerating the scaffolding, testing, and packaging of enterprise identity and directory synchronization drivers.',
+        stack: ['TypeScript', 'Identity Connectors', 'CLI Tooling', 'Automation'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba?tab=repositories',
+        demoLabel: 'View @mapurba Profile'
+      },
+      {
+        id: 'event-pool',
+        category: 'enterprise',
+        categoryLabel: 'Enterprise & IAM',
+        title: 'event-pool',
+        tagline: 'High-Throughput Asynchronous Event Dispatcher',
+        visibility: 'Enterprise Core',
+        language: 'Java',
+        description: 'Concurrent Java event-pooling architecture engineered for low-latency message dispatching, backpressure handling, and enterprise audit streams.',
+        stack: ['Java', 'Concurrency', 'Event-Driven', 'Low Latency'],
+        githubUrl: 'https://github.com/mapurba',
+        demoUrl: 'https://github.com/mapurba?tab=repositories',
+        demoLabel: 'View @mapurba Profile'
+      },
+      {
+        id: 'fluentd-docker-image',
+        category: 'enterprise',
+        categoryLabel: 'Enterprise & IAM',
+        title: 'fluentd-docker-image',
+        tagline: 'Containerized Enterprise Log Aggregation Pipeline',
+        visibility: 'Public',
+        language: 'Python / Docker',
+        description: 'Hardened Docker build and Python configuration generator for unified log routing, structured telemetry forwarding, and container observability.',
+        stack: ['Docker', 'Fluentd', 'Python', 'Observability'],
+        githubUrl: 'https://github.com/mapurba/fluentd-docker-image',
+        demoUrl: 'https://github.com/mapurba/fluentd-docker-image',
+        demoLabel: 'Inspect Dockerfile'
+      },
+
+      // --- GAMES & 3D (3) ---
+      {
+        id: 'idemo-arcade-hub',
+        category: 'games',
+        categoryLabel: 'Games & 3D',
+        title: 'idemo.app Arcade Hub',
+        tagline: 'Interactive Web Games Hosted at game.idemo.app',
+        visibility: 'Live Production',
+        language: 'WebGL / JS',
+        description: 'Multi-game browser portal deployed at https://game.idemo.app/ and backed by mapurba/idemo.app.github.io for instant-play 3D and arcade experiences.',
+        stack: ['Three.js', 'WebGL', 'HTML5 Canvas', 'game.idemo.app'],
+        githubUrl: 'https://github.com/mapurba/idemo.app.github.io',
+        demoUrl: 'https://game.idemo.app/',
+        demoLabel: 'Play on game.idemo.app'
+      },
+      {
+        id: 'dead-earth',
+        category: 'games',
+        categoryLabel: 'Games & 3D',
+        title: 'DEAD-EARTH',
+        tagline: '3D Zombie Survival Shooter in Unity C#',
+        visibility: 'Public',
+        language: 'C# / Unity',
+        description: 'Atmospheric third/first-person zombie survival demo built in Unity C# featuring AI navmesh hordes, weapon ballistics, and dynamic lighting.',
+        stack: ['C#', 'Unity 3D', 'AI NavMesh', 'Game Physics'],
+        githubUrl: 'https://github.com/mapurba/DEAD-EARTH',
+        demoUrl: 'https://game.idemo.app/',
+        demoLabel: 'Visit game.idemo.app'
+      },
+      {
+        id: 'igi-2-android',
+        category: 'games',
+        categoryLabel: 'Games & 3D',
+        title: 'IGI-2-Covert-Strike-Android',
+        tagline: 'Ground-Up Native Android Tactical FPS Rewrite',
+        visibility: 'Public',
+        language: 'C# / Android',
+        description: 'Native ground-up mobile rewrite reviving the classic tactical stealth shooter IGI 2: Covert Strike with mobile-optimized controls and 3D rendering.',
+        stack: ['C#', 'Android Native', '3D FPS', 'Tactical AI'],
+        githubUrl: 'https://github.com/mapurba/IGI-2-Covert-Strike-Android',
+        demoUrl: 'https://github.com/mapurba/IGI-2-Covert-Strike-Android',
+        demoLabel: 'Inspect Android Build'
+      },
+
+      // --- MICRO-FRONTENDS (3) ---
+      {
+        id: 'angular-dynamic-forms',
+        category: 'microfrontends',
+        categoryLabel: 'Micro-Frontends',
+        title: 'angular-dynamic-forms',
+        tagline: 'JSON-Driven Dynamic Form & Validation Engine',
+        visibility: 'Public (MIT)',
+        language: 'TypeScript',
+        description: 'Schema-driven Angular form builder supporting recursive JSON layouts, custom async validators, and dynamic enterprise rule bindings.',
+        stack: ['TypeScript', 'Angular', 'JSON Forms', 'Validation'],
+        githubUrl: 'https://github.com/mapurba/angular-dynamic-forms',
+        demoUrl: 'https://github.com/mapurba/angular-dynamic-forms',
+        demoLabel: 'View on GitHub'
+      },
+      {
+        id: 'luigi-micro-frontends',
+        category: 'microfrontends',
+        categoryLabel: 'Micro-Frontends',
+        title: 'Micro-Frontends & Luigi',
+        tagline: 'Federated Enterprise Shell & Angular Micro-Apps',
+        visibility: 'Public',
+        language: 'JavaScript / HTML',
+        description: 'Enterprise micro-frontend orchestration combining the Luigi framework (mapurba/luigi) and Angular module federation (Micro-Frontends-in-Angular).',
+        stack: ['Luigi Framework', 'Angular', 'Module Federation', 'SPA'],
+        githubUrl: 'https://github.com/mapurba/Micro-Frontends-in-Angular',
+        demoUrl: 'https://github.com/mapurba/luigi',
+        demoLabel: 'View Luigi Fork'
+      },
+      {
+        id: 'xmllint-wasm-flextree',
+        category: 'microfrontends',
+        categoryLabel: 'Micro-Frontends',
+        title: 'xmllint-wasm & d3-flextree',
+        tagline: 'In-Browser WebAssembly XML Validator & D3 Trees',
+        visibility: 'Public',
+        language: 'JavaScript / WASM',
+        description: 'Client-side Emscripten WebAssembly port of libxml (xmllint-wasm) paired with variable-node D3 hierarchical tree layouts (d3-flextree).',
+        stack: ['WebAssembly', 'D3.js', 'libxml2', 'Data Visualization'],
+        githubUrl: 'https://github.com/mapurba/xmllint-wasm',
+        demoUrl: 'https://github.com/mapurba/d3-flextree',
+        demoLabel: 'View d3-flextree'
+      }
+    ];
+
+    // =========================================================================
+    // 2. FILTERING, LIVE SEARCH, 3D TILT CARDS & DETAIL MODAL
+    // =========================================================================
+    let currentCategory = 'all';
+    let currentSearchQuery = '';
+
+    const projectsGrid = document.getElementById('projects-grid');
+    const emptySearchState = document.getElementById('empty-search-state');
+
+    function getCategoryBadgeStyle(category) {
+      switch (category) {
+        case 'ai':
+          return 'bg-violet-500/15 text-violet-700 dark:bg-violet-400/15 dark:text-violet-300';
+        case 'enterprise':
+          return 'bg-indigo-500/15 text-indigo-700 dark:bg-cyan-400/15 dark:text-cyan-300';
+        case 'games':
+          return 'bg-teal-500/15 text-teal-700 dark:bg-emerald-400/15 dark:text-emerald-300';
+        default:
+          return 'bg-amber-500/15 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300';
+      }
+    }
+
+    function renderProjects() {
+      const q = currentSearchQuery.trim().toLowerCase();
+      const filtered = PROJECTS.filter(p => {
+        const matchesCat = currentCategory === 'all' || p.category === currentCategory;
+        const matchesSearch = !q ||
+          p.title.toLowerCase().includes(q) ||
+          p.tagline.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.language.toLowerCase().includes(q) ||
+          p.stack.some(s => s.toLowerCase().includes(q));
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        projectsGrid.innerHTML = '';
+        emptySearchState.classList.remove('hidden');
+        return;
+      }
+
+      emptySearchState.classList.add('hidden');
+      projectsGrid.innerHTML = filtered.map(project => {
+        const badgeStyle = getCategoryBadgeStyle(project.category);
+        return `
+          <article onclick="openModal('${project.id}')"
+            class="tilt-card glass-card rounded-3xl p-6 flex flex-col justify-between cursor-pointer group relative overflow-hidden">
+            <div class="space-y-3.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold ${badgeStyle}">
+                  ${project.categoryLabel}
+                </span>
+                <span class="text-[11px] font-mono opacity-65">${project.language}</span>
+              </div>
+
+              <div>
+                <h3 class="font-display text-lg font-bold group-hover:text-indigo-600 dark:group-hover:text-cyan-400 transition-colors break-words">
+                  ${project.title}
+                </h3>
+                <p class="text-xs font-medium opacity-70 mt-0.5">${project.tagline}</p>
+              </div>
+
+              <p class="text-xs sm:text-sm opacity-75 leading-relaxed line-clamp-3">
+                ${project.description}
+              </p>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-900/5 dark:border-white/5 space-y-3.5">
+              <div class="flex flex-wrap gap-1.5">
+                ${project.stack.map(tech => `
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-900/5 dark:bg-white/5 opacity-85">
+                    ${tech}
+                  </span>
+                `).join('')}
+              </div>
+
+              <div class="flex items-center justify-between gap-2 pt-1">
+                <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()"
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>GitHub</span>
+                </a>
+                <span class="text-xs font-semibold text-indigo-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
+                  Details &rarr;
+                </span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      attachTiltListeners();
+    }
+
+    function filterProjects(category) {
+      currentCategory = category;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-filter') === category;
+        if (isActive) {
+          btn.classList.add('active', 'bg-indigo-600', 'text-white', 'dark:bg-cyan-400', 'dark:text-slate-950', 'shadow-sm');
+          btn.classList.remove('opacity-75');
+        } else {
+          btn.classList.remove('active', 'bg-indigo-600', 'text-white', 'dark:bg-cyan-400', 'dark:text-slate-950', 'shadow-sm');
+          btn.classList.add('opacity-75');
+        }
+      });
+      renderProjects();
+    }
+
+    function handleSearchInput(val) {
+      currentSearchQuery = val;
+      renderProjects();
+    }
+
+    function resetFilters() {
+      currentSearchQuery = '';
+      const searchInput = document.getElementById('repo-search');
+      if (searchInput) searchInput.value = '';
+      filterProjects('all');
+    }
+
+    function attachTiltListeners() {
+      document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const rotateX = (((y - rect.height / 2) / (rect.height / 2)) * -5).toFixed(2);
+          const rotateY = (((x - rect.width / 2) / (rect.width / 2)) * 5).toFixed(2);
+          card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        });
+      });
+    }
+
+    // =========================================================================
+    // 3. INTERACTIVE REPOSITORY MODAL ('View on GitHub' & 'Launch Demo')
+    // =========================================================================
+    const modal = document.getElementById('project-modal');
+    const modalDialog = document.getElementById('modal-dialog');
+    const modalContent = document.getElementById('modal-content');
+
+    function openModal(projectId) {
+      const p = PROJECTS.find(item => item.id === projectId);
+      if (!p) return;
+
+      const badgeStyle = getCategoryBadgeStyle(p.category);
+      modalContent.innerHTML = `
+        <div class="space-y-2 pr-8">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${badgeStyle}">${p.categoryLabel}</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-slate-900/5 dark:bg-white/10">${p.language} &bull; ${p.visibility}</span>
+          </div>
+          <h3 class="font-display text-2xl font-bold break-words">${p.title}</h3>
+          <p class="text-xs sm:text-sm font-medium opacity-70">${p.tagline}</p>
+        </div>
+
+        <p class="text-sm opacity-85 leading-relaxed">
+          ${p.description}
+        </p>
+
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider opacity-65 mb-2">Technologies &amp; Domain</div>
+          <div class="flex flex-wrap gap-2">
+            ${p.stack.map(s => `<span class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/10">${s}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-900/5 dark:bg-white/[0.04] flex items-center justify-between gap-2 text-xs">
+          <span class="font-mono truncate opacity-80">${p.githubUrl}</span>
+          <button type="button" onclick="copyText('${p.githubUrl}', 'Copied repository URL!')"
+            class="px-2.5 py-1 rounded-lg bg-slate-900/10 dark:bg-white/10 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 font-semibold flex-shrink-0">
+            Copy URL
+          </button>
+        </div>
+
+        <div class="pt-2 flex flex-col sm:flex-row gap-3">
+          <a href="${p.githubUrl}" target="_blank" rel="noopener noreferrer"
+            class="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl font-semibold text-sm text-white dark:text-slate-950 bg-indigo-600 hover:bg-indigo-700 dark:bg-cyan-400 dark:hover:bg-cyan-300 transition-all shadow-lg">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            <span>View on GitHub</span>
+          </a>
+
+          <a href="${p.demoUrl}" target="_blank" rel="noopener noreferrer"
+            class="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl font-semibold text-sm bg-teal-600/15 hover:bg-teal-600/25 text-teal-800 dark:bg-violet-500/20 dark:hover:bg-violet-500/30 dark:text-violet-200 transition-colors">
+            <span>Launch Demo</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
+            </svg>
+          </a>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      requestAnimationFrame(() => {
+        modalDialog.classList.remove('scale-95', 'opacity-0');
+        modalDialog.classList.add('scale-100', 'opacity-100');
+      });
+    }
+
+    function closeModal() {
+      modalDialog.classList.remove('scale-100', 'opacity-100');
+      modalDialog.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }, 220);
+    }
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+
+    // =========================================================================
+    // 4. CLIPBOARD HELPER & TOAST FEEDBACK (iFrame-Safe)
+    // =========================================================================
+    function copyText(text, successMsg) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg || 'Copied!');
+      } catch (err) {
+        showToast('Unable to copy automatically');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast-banner');
+      const toastMsg = document.getElementById('toast-message');
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 2800);
+    }
+
+    // =========================================================================
+    // 5. THREE.JS 60FPS KINETIC SCULPTURE ENGINE (OBSIDIAN CYBER & ALABASTER PRISM)
+    // =========================================================================
+    let scene, camera, renderer, coreGroup, innerCore, outerWireframe, ring1, ring2, ring3, particlesMesh;
+    let pointLight1, pointLight2, ambientLight;
+    let mouseX = 0, mouseY = 0;
+    let targetMouseX = 0, targetMouseY = 0;
+    let kineticBurst = 0;
+    let sculptureMode = 'orbit'; // 'orbit' | 'pulse' | 'hyperspin'
+
+    const THEME_COLORS = {
+      dark: {
+        coreColor: 0x0b132b,
+        coreEmissive: 0x00f0ff,
+        wireColor: 0x8b5cf6,
+        ring1Color: 0x00f0ff,
+        ring2Color: 0x8b5cf6,
+        ring3Color: 0x38bdf8,
+        particleColor: 0x38bdf8,
+        light1: 0x00f0ff,
+        light2: 0x8b5cf6,
+        fogColor: 0x06080f
+      },
+      light: {
+        coreColor: 0xe0e7ff,
+        coreEmissive: 0x4f46e5,
+        wireColor: 0x0d9488,
+        ring1Color: 0x4f46e5,
+        ring2Color: 0x0d9488,
+        ring3Color: 0x2563eb,
+        particleColor: 0x4f46e5,
+        light1: 0x4f46e5,
+        light2: 0x0d9488,
+        fogColor: 0xf8fafc
+      }
+    };
+
+    function initThreeScene() {
+      const canvas = document.getElementById('webgl-canvas');
+      scene = new THREE.Scene();
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const palette = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+      scene.fog = new THREE.FogExp2(palette.fogColor, 0.032);
+
+      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, 11.5);
+
+      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Lights
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      pointLight1 = new THREE.PointLight(palette.light1, 2.5, 32);
+      pointLight1.position.set(6, 5, 7);
+      scene.add(pointLight1);
+
+      pointLight2 = new THREE.PointLight(palette.light2, 2.3, 32);
+      pointLight2.position.set(-6, -5, 6);
+      scene.add(pointLight2);
+
+      // Kinetic Sculpture Group
+      coreGroup = new THREE.Group();
+      scene.add(coreGroup);
+
+      // 1. Inner Faceted Crystalline Core
+      const coreGeo = new THREE.IcosahedronGeometry(2.0, 1);
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: palette.coreColor,
+        emissive: palette.coreEmissive,
+        emissiveIntensity: isDark ? 0.36 : 0.18,
+        roughness: 0.22,
+        metalness: 0.88,
+        flatShading: true
+      });
+      innerCore = new THREE.Mesh(coreGeo, coreMat);
+      coreGroup.add(innerCore);
+
+      // 2. Geodesic Wireframe Shell
+      const wireGeo = new THREE.IcosahedronGeometry(2.65, 2);
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: palette.wireColor,
+        wireframe: true,
+        transparent: true,
+        opacity: isDark ? 0.34 : 0.24
+      });
+      outerWireframe = new THREE.Mesh(wireGeo, wireMat);
+      coreGroup.add(outerWireframe);
+
+      // 3. Three Intersecting Gyroscopic Rings
+      const ring1Geo = new THREE.TorusGeometry(3.45, 0.025, 16, 120);
+      ring1 = new THREE.Mesh(ring1Geo, new THREE.MeshBasicMaterial({ color: palette.ring1Color, transparent: true, opacity: 0.6 }));
+      ring1.rotation.x = Math.PI / 3;
+      coreGroup.add(ring1);
+
+      const ring2Geo = new THREE.TorusGeometry(4.0, 0.02, 16, 120);
+      ring2 = new THREE.Mesh(ring2Geo, new THREE.MeshBasicMaterial({ color: palette.ring2Color, transparent: true, opacity: 0.5 }));
+      ring2.rotation.y = Math.PI / 4;
+      coreGroup.add(ring2);
+
+      const ring3Geo = new THREE.TorusGeometry(4.55, 0.018, 16, 120);
+      ring3 = new THREE.Mesh(ring3Geo, new THREE.MeshBasicMaterial({ color: palette.ring3Color, transparent: true, opacity: 0.4 }));
+      ring3.rotation.x = -Math.PI / 3.5;
+      ring3.rotation.y = -Math.PI / 5;
+      coreGroup.add(ring3);
+
+      // Orbiting Data Nodes on Ring 1
+      const nodeGeo = new THREE.SphereGeometry(0.11, 16, 16);
+      const nodeMat = new THREE.MeshBasicMaterial({ color: palette.ring1Color });
+      for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        const node = new THREE.Mesh(nodeGeo, nodeMat);
+        node.position.set(Math.cos(angle) * 3.45, Math.sin(angle) * 3.45, 0);
+        ring1.add(node);
+      }
+
+      // 4. Ambient Particle Field
+      const particleCount = 480;
+      const posArray = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount * 3; i++) {
+        posArray[i] = (Math.random() - 0.5) * 30;
+      }
+      const particlesGeo = new THREE.BufferGeometry();
+      particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      particlesMesh = new THREE.Points(particlesGeo, new THREE.PointsMaterial({
+        size: 0.06,
+        color: palette.particleColor,
+        transparent: true,
+        opacity: isDark ? 0.68 : 0.45
+      }));
+      scene.add(particlesMesh);
+
+      updateResponsiveCorePosition();
+    }
+
+    function updateThreeTheme(isDark) {
+      if (!scene) return;
+      const p = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+      scene.fog.color.setHex(p.fogColor);
+      pointLight1.color.setHex(p.light1);
+      pointLight2.color.setHex(p.light2);
+      innerCore.material.color.setHex(p.coreColor);
+      innerCore.material.emissive.setHex(p.coreEmissive);
+      innerCore.material.emissiveIntensity = isDark ? 0.36 : 0.18;
+      outerWireframe.material.color.setHex(p.wireColor);
+      outerWireframe.material.opacity = isDark ? 0.34 : 0.24;
+      ring1.material.color.setHex(p.ring1Color);
+      ring2.material.color.setHex(p.ring2Color);
+      ring3.material.color.setHex(p.ring3Color);
+      particlesMesh.material.color.setHex(p.particleColor);
+      particlesMesh.material.opacity = isDark ? 0.68 : 0.45;
+    }
+
+    function updateResponsiveCorePosition() {
+      if (!coreGroup) return;
+      if (window.innerWidth >= 1024) {
+        coreGroup.position.set(3.25, 0.2, 0);
+      } else {
+        coreGroup.position.set(0, 1.4, -1.6);
+      }
+    }
+
+    function setSculptureMode(mode) {
+      sculptureMode = mode;
+      const buttons = {
+        orbit: document.getElementById('btn-mode-orbit'),
+        pulse: document.getElementById('btn-mode-pulse'),
+        hyperspin: document.getElementById('btn-mode-hyperspin')
+      };
+
+      Object.entries(buttons).forEach(([key, btn]) => {
+        if (!btn) return;
+        if (key === mode) {
+          btn.className = 'sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 transition-all';
+        } else {
+          btn.className = 'sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-700 dark:bg-cyan-400/10 dark:hover:bg-cyan-400/20 dark:text-cyan-300 transition-all';
+        }
+      });
+    }
+
+    function triggerKineticBurst() {
+      kineticBurst = 1.25;
+    }
+
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
+      kineticBurst *= 0.94;
+
+      const spinMultiplier = sculptureMode === 'hyperspin' ? 3.2 : 1.0;
+
+      if (coreGroup) {
+        innerCore.rotation.y += (0.006 * spinMultiplier) + kineticBurst * 0.045;
+        innerCore.rotation.x += (0.003 * spinMultiplier) + kineticBurst * 0.025;
+
+        outerWireframe.rotation.y -= (0.0045 * spinMultiplier) + kineticBurst * 0.03;
+        outerWireframe.rotation.z += 0.002 * spinMultiplier;
+
+        ring1.rotation.z += (0.008 * spinMultiplier) + kineticBurst * 0.05;
+        ring2.rotation.x -= (0.0065 * spinMultiplier) + kineticBurst * 0.04;
+        ring3.rotation.y += (0.0055 * spinMultiplier) + kineticBurst * 0.035;
+
+        const scrollOffset = window.scrollY * 0.0014;
+        coreGroup.rotation.y = mouseX * 0.65 + scrollOffset;
+        coreGroup.rotation.x = mouseY * 0.45;
+
+        const baseScale = window.innerWidth >= 1024 ? 1.0 : 0.8;
+        const pulseWave = sculptureMode === 'pulse' ? Math.sin(elapsed * 4.2) * 0.08 : 0;
+        const finalScale = baseScale + pulseWave + kineticBurst * 0.14;
+        coreGroup.scale.set(finalScale, finalScale, finalScale);
+      }
+
+      if (particlesMesh) {
+        particlesMesh.rotation.y = elapsed * 0.03 + mouseX * 0.15;
+        particlesMesh.rotation.x = mouseY * 0.1;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // =========================================================================
+    // 6. THEME SWITCHER, SCROLL REVEAL & FORM SUBMISSION
+    // =========================================================================
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeBadgeLabel = document.getElementById('theme-badge-label');
+
+    function setTheme(mode) {
+      const htmlEl = document.documentElement;
+      const isDark = mode === 'dark';
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        if (themeBadgeLabel) themeBadgeLabel.textContent = 'Obsidian Cyber';
+      } else {
+        htmlEl.classList.remove('dark');
+        if (themeBadgeLabel) themeBadgeLabel.textContent = 'Alabaster Prism';
+      }
+      localStorage.setItem('idemo-theme', mode);
+      updateThreeTheme(isDark);
+    }
+
+    const savedTheme = localStorage.getItem('idemo-theme');
+    setTheme(savedTheme || 'dark');
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      setTheme(isCurrentlyDark ? 'light' : 'dark');
+    });
+
+    const cursorGlow = document.getElementById('cursor-glow');
+    window.addEventListener('mousemove', (e) => {
+      targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      targetMouseY = (e.clientY / window.innerHeight) * 2 - 1;
+      if (cursorGlow) {
+        cursorGlow.style.left = `${e.clientX}px`;
+        cursorGlow.style.top = `${e.clientY}px`;
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (!camera || !renderer) return;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      updateResponsiveCorePosition();
+    });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    const contactForm = document.getElementById('contact-form');
+    const formFeedback = document.getElementById('form-feedback');
+
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      formFeedback.classList.remove('hidden');
+      contactForm.reset();
+      triggerKineticBurst();
+      showToast('Message recorded for Apurba Mondal (@mapurba)');
+      setTimeout(() => formFeedback.classList.add('hidden'), 6500);
+    });
+
+    window.onload = function () {
+      renderProjects();
+      initThreeScene();
+      animate();
+    };
+  </script>
+</body>
+</html>
