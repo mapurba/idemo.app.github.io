@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apurba Mondal (@mapurba) — idemo.app | 3D Games &amp; Enterprise Ecosystem</title>
-  <meta name="description" content="Official 3D portfolio of Apurba Mondal (@mapurba) and idemo.app (www.idemo.app). Explore WebGL games on game.idemo.app, AI Agents, Enterprise IAM, and Micro-Frontends on GitHub." />
+  <title>Apurba Mondal (@mapurba) — idemo.app | 3D Solar System &amp; Enterprise Ecosystem</title>
+  <meta name="description" content="Official 3D portfolio of Apurba Mondal (@mapurba) and idemo.app (www.idemo.app). Explore an interactive 3D Solar System, WebGL games on game.idemo.app, AI Agents, Enterprise IAM, and Micro-Frontends on GitHub." />
 
   <!-- Google Fonts: Inter & Space Grotesk -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
- <!-- <script src="https://cdn.tailwindcss.com"></script>
-  -->
+  <!-- Tailwind CSS CDN -->
   <link href="./output.css" rel="stylesheet">
-  <!-- Three.js CDN -->
+
+  <!-- Three.js r128 & OrbitControls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <!-- Tailwind Configuration -->
   <script>
@@ -29,8 +29,8 @@
             display: ['Space Grotesk', 'sans-serif'],
           },
           colors: {
-            obsidian: '#06080f',
-            alabaster: '#f8fafc',
+            obsidian: '#04060d',
+            alabaster: '#f4f7fb',
           }
         }
       }
@@ -40,30 +40,30 @@
   <style>
     /* Theme Tokens */
     :root {
-      --bg-primary: #f8fafc;
+      --bg-primary: #eef2f9;
       --bg-secondary: #ffffff;
       --text-primary: #0f172a;
       --text-secondary: #475569;
       --accent-primary: #4f46e5;
       --accent-secondary: #0d9488;
-      --glass-bg: rgba(255, 255, 255, 0.76);
-      --glass-border: rgba(15, 23, 42, 0.08);
-      --glass-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
-      --glow-color: rgba(79, 70, 229, 0.14);
+      --glass-bg: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(15, 23, 42, 0.09);
+      --glass-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.1);
+      --glow-color: rgba(79, 70, 229, 0.12);
       --card-hover-border: rgba(79, 70, 229, 0.42);
     }
 
     html.dark {
-      --bg-primary: #06080f;
-      --bg-secondary: #0d111c;
+      --bg-primary: #04060d;
+      --bg-secondary: #0b0f1c;
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --accent-primary: #00f0ff;
       --accent-secondary: #8b5cf6;
-      --glass-bg: rgba(13, 17, 28, 0.68);
-      --glass-border: rgba(255, 255, 255, 0.09);
-      --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.68);
-      --glow-color: rgba(0, 240, 255, 0.12);
+      --glass-bg: rgba(10, 14, 26, 0.66);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+      --glow-color: rgba(0, 240, 255, 0.1);
       --card-hover-border: rgba(0, 240, 255, 0.48);
     }
 
@@ -77,22 +77,81 @@
       overflow-x: hidden;
     }
 
-    /* Fullscreen Fixed 3D WebGL Background */
-    #webgl-canvas {
+    /* Fullscreen Interactive 3D Solar System Canvas */
+    #solar-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       z-index: 0;
+      display: block;
+      cursor: grab;
+      touch-action: pan-y;
+    }
+
+    #solar-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* 3D Floating Planet Labels Overlay */
+    #planet-labels-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
       pointer-events: none;
+      overflow: hidden;
+      transition: opacity 0.35s ease;
+    }
+
+    .planet-tag {
+      position: absolute;
+      transform: translate(-50%, -140%);
+      pointer-events: auto;
+      cursor: pointer;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.25s ease;
+    }
+
+    html.dark .planet-tag {
+      background: rgba(10, 15, 30, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #e2e8f0;
+    }
+
+    html:not(.dark) .planet-tag {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(15, 23, 42, 0.14);
+      color: #0f172a;
+    }
+
+    .planet-tag:hover,
+    .planet-tag.active {
+      transform: translate(-50%, -150%) scale(1.08);
+      border-color: #00f0ff;
+    }
+
+    html:not(.dark) .planet-tag:hover,
+    html:not(.dark) .planet-tag.active {
+      border-color: #4f46e5;
     }
 
     /* Ambient Cursor Spotlight */
     #cursor-glow {
       position: fixed;
-      width: 520px;
-      height: 520px;
+      width: 480px;
+      height: 480px;
       border-radius: 50%;
       background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
       pointer-events: none;
@@ -109,6 +168,20 @@
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-shadow);
       transition: background 0.5s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease-out;
+    }
+
+    .glass-hero-subtle {
+      background: rgba(10, 14, 26, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.6);
+    }
+
+    html:not(.dark) .glass-hero-subtle {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
     }
 
     .glass-card {
@@ -177,16 +250,22 @@
     }
 
     /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 8px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-primary); }
     ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.35); border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.55); }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
 
-  <!-- Interactive Three.js WebGL Background -->
-  <canvas id="webgl-canvas"></canvas>
+  <!-- Interactive Three.js 3D Solar System Background -->
+  <canvas id="solar-canvas"></canvas>
+
+  <!-- 3D Projected Planet Tags Layer -->
+  <div id="planet-labels-layer"></div>
 
   <!-- Subtle Cursor Ambient Spotlight -->
   <div id="cursor-glow" class="hidden md:block"></div>
@@ -197,19 +276,18 @@
     <span id="toast-message">Copied to clipboard!</span>
   </div>
 
-  <!-- Main Content Wrapper -->
-  <div class="relative z-10 flex flex-col min-h-screen">
+  <!-- Main Content Wrapper (pointer-events-none on outer container lets empty hero space pass clicks/drags directly to 3D Solar System) -->
+  <div class="relative z-10 flex flex-col min-h-screen pointer-events-none">
 
     <!-- Sticky Glassmorphic Navigation Bar -->
-    <header class="sticky top-0 z-40 px-4 sm:px-6 lg:px-8 pt-4">
+    <header class="sticky top-0 z-40 px-4 sm:px-6 lg:px-8 pt-4 pointer-events-auto">
       <nav class="max-w-7xl mx-auto glass-panel rounded-2xl px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
         <!-- Brand & Developer Identity -->
         <a href="#" class="flex items-center gap-3 group focus:outline-none">
           <div class="relative w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-600 to-teal-500 dark:from-cyan-400 dark:to-violet-600 shadow-lg transition-transform duration-300 group-hover:scale-105">
             <svg class="w-5 h-5 text-white dark:text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-              <line x1="12" y1="22" x2="12" y2="15.5"></line>
-              <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
+              <circle cx="12" cy="12" r="3.5"></circle>
+              <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-22 12 12)"></ellipse>
             </svg>
           </div>
           <div class="flex flex-col">
@@ -224,6 +302,7 @@
 
         <!-- Desktop Navigation Links -->
         <div class="hidden lg:flex items-center gap-7 text-sm font-medium">
+          <a href="#hero-space" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">3D Solar System</a>
           <a href="#ecosystem" onclick="filterProjects('all')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">Repositories</a>
           <a href="#ecosystem" onclick="filterProjects('ai')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">AI &amp; Agents</a>
           <a href="#ecosystem" onclick="filterProjects('enterprise')" class="opacity-80 hover:opacity-100 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">Enterprise &amp; IAM</a>
@@ -245,12 +324,10 @@
           <!-- Dark / Light Mode Toggle -->
           <button id="theme-toggle" type="button" aria-label="Toggle Dark and Light Mode"
             class="p-2.5 rounded-xl border border-slate-300/60 dark:border-white/10 bg-white/60 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400">
-            <!-- Sun Icon (Dark Mode) -->
             <svg id="icon-sun" class="w-5 h-5 text-amber-300 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="5"></circle>
               <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
             </svg>
-            <!-- Moon Icon (Light Mode) -->
             <svg id="icon-moon" class="w-5 h-5 text-indigo-600 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
@@ -271,14 +348,16 @@
     <!-- Main Content -->
     <main class="flex-grow">
 
-      <!-- Hero Section -->
-      <section class="relative pt-12 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <!-- Spacious Landing Hero Section with Unobstructed 3D Solar System Stage -->
+      <section id="hero-space" class="relative min-h-[calc(100vh-5.5rem)] flex flex-col justify-between pt-8 pb-8 sm:pt-12 sm:pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 
-          <!-- Left Hero Copy -->
-          <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+        <!-- Top & Left Hero Content with Generous Open Space on the Right/Center for the 3D Solar System -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          <!-- Left Hero Copy (Compact & Translucent so 3D Planets Shine Through) -->
+          <div id="hero-copy-block" class="lg:col-span-6 space-y-5 text-center lg:text-left pointer-events-auto glass-hero-subtle rounded-3xl p-6 sm:p-8 transition-opacity duration-300">
             <!-- Developer & Domain Badge -->
-            <div class="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2.5 px-4 py-1.5 rounded-full glass-panel text-xs font-semibold tracking-wide">
+            <div class="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2.5 px-3.5 py-1.5 rounded-full glass-panel text-xs font-semibold tracking-wide">
               <span class="relative flex h-2.5 w-2.5">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 dark:bg-cyan-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500 dark:bg-cyan-400"></span>
@@ -287,20 +366,20 @@
             </div>
 
             <!-- Headline -->
-            <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
+            <h1 class="font-display text-3xl sm:text-5xl lg:text-[3.25rem] font-bold tracking-tight leading-[1.08]">
               Building <span class="gradient-text-light dark:gradient-text-dark">AI Agents</span>, <span class="gradient-text-light dark:gradient-text-dark">Enterprise IAM</span> &amp; <span class="gradient-text-light dark:gradient-text-dark">3D Web Games</span>
             </h1>
 
             <!-- Bio & Ecosystem Summary -->
-            <p class="text-base sm:text-lg opacity-80 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p class="text-sm sm:text-base opacity-85 leading-relaxed">
               Welcome to <strong>idemo.app</strong> (<a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer" class="underline decoration-indigo-500 dark:decoration-cyan-400 underline-offset-4 font-medium">www.idemo.app</a>), the engineering hub of <strong>Apurba Mondal</strong>. Explore browser-native games hosted at <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer" class="underline decoration-teal-500 dark:decoration-cyan-400 underline-offset-4 font-medium">game.idemo.app</a> alongside 71+ open-source and enterprise repositories spanning LLM copilots, NetIQ Identity drivers, RBAC engines, and micro-frontends.
             </p>
 
             <!-- Hero Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+            <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-3 pt-1">
               <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl font-semibold text-sm text-white dark:text-slate-950 bg-gradient-to-r from-indigo-600 to-teal-600 dark:from-cyan-400 dark:to-violet-500 shadow-xl shadow-indigo-600/20 dark:shadow-cyan-500/20 hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-semibold text-xs sm:text-sm text-white dark:text-slate-950 bg-gradient-to-r from-indigo-600 to-teal-600 dark:from-cyan-400 dark:to-violet-500 shadow-xl shadow-indigo-600/20 dark:shadow-cyan-500/20 hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                   <rect x="2" y="6" width="20" height="12" rx="4"></rect>
                   <path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></path>
                 </svg>
@@ -308,7 +387,7 @@
               </a>
 
               <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold text-sm glass-panel hover:border-indigo-500/50 dark:hover:border-cyan-400/50 transition-all duration-300 hover:-translate-y-0.5">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-semibold text-xs sm:text-sm glass-panel hover:border-indigo-500/50 dark:hover:border-cyan-400/50 transition-all duration-300 hover:-translate-y-0.5">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                 </svg>
@@ -316,7 +395,7 @@
               </a>
 
               <a href="#ecosystem"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold text-sm glass-panel hover:border-teal-500/50 dark:hover:border-violet-400/50 transition-all duration-300 hover:-translate-y-0.5">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-semibold text-xs sm:text-sm glass-panel hover:border-teal-500/50 dark:hover:border-violet-400/50 transition-all duration-300 hover:-translate-y-0.5">
                 <span>Browse Repos</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -325,506 +404,544 @@
             </div>
 
             <!-- Real GitHub Telemetry Metrics -->
-            <div class="grid grid-cols-3 gap-3 sm:gap-5 pt-3 max-w-xl mx-auto lg:mx-0">
-              <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer" class="glass-panel rounded-2xl p-3.5 sm:p-4 text-center lg:text-left hover:border-indigo-500/40 dark:hover:border-cyan-400/40 transition-all">
-                <div class="font-display font-bold text-xl sm:text-2xl text-indigo-600 dark:text-cyan-400">71+</div>
-                <div class="text-xs opacity-70 mt-0.5">GitHub Repos</div>
+            <div class="grid grid-cols-3 gap-3 pt-1">
+              <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer" class="glass-panel rounded-2xl p-3 text-center lg:text-left hover:border-indigo-500/40 dark:hover:border-cyan-400/40 transition-all">
+                <div class="font-display font-bold text-lg sm:text-xl text-indigo-600 dark:text-cyan-400">71+</div>
+                <div class="text-[11px] opacity-70">GitHub Repos</div>
               </a>
-              <a href="https://github.com/mapurba?tab=stars" target="_blank" rel="noopener noreferrer" class="glass-panel rounded-2xl p-3.5 sm:p-4 text-center lg:text-left hover:border-teal-500/40 dark:hover:border-violet-400/40 transition-all">
-                <div class="font-display font-bold text-xl sm:text-2xl text-teal-600 dark:text-violet-400">79+</div>
-                <div class="text-xs opacity-70 mt-0.5">Stars &amp; Pro Badges</div>
+              <a href="https://github.com/mapurba?tab=stars" target="_blank" rel="noopener noreferrer" class="glass-panel rounded-2xl p-3 text-center lg:text-left hover:border-teal-500/40 dark:hover:border-violet-400/40 transition-all">
+                <div class="font-display font-bold text-lg sm:text-xl text-teal-600 dark:text-violet-400">79+</div>
+                <div class="text-[11px] opacity-70">Stars &amp; Pro</div>
               </a>
-              <div class="glass-panel rounded-2xl p-3.5 sm:p-4 text-center lg:text-left">
-                <div class="font-display font-bold text-xl sm:text-2xl text-indigo-600 dark:text-cyan-400">5 Orgs</div>
-                <div class="text-xs opacity-70 mt-0.5">Ecosystem Hubs</div>
+              <div class="glass-panel rounded-2xl p-3 text-center lg:text-left">
+                <div class="font-display font-bold text-lg sm:text-xl text-indigo-600 dark:text-cyan-400">5 Orgs</div>
+                <div class="text-[11px] opacity-70">Ecosystem Hubs</div>
               </div>
             </div>
           </div>
 
-          <!-- Right Interactive 3D Kinetic Sculpture & GitHub Quick-Access HUD -->
-          <div class="lg:col-span-5 flex justify-center">
-            <div class="glass-panel rounded-3xl p-6 sm:p-7 w-full max-w-md space-y-5 relative overflow-hidden">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-                  <span class="w-3 h-3 rounded-full bg-amber-400/80"></span>
-                  <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-                </div>
-                <span class="text-xs font-mono opacity-60">THREE.JS // KINETIC_CORE</span>
-              </div>
-
-              <!-- 3D Kinetic Sculpture Controls -->
-              <div class="rounded-2xl p-4 sm:p-5 bg-slate-900/5 dark:bg-white/[0.03] border border-slate-900/5 dark:border-white/5 space-y-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold uppercase tracking-wider opacity-75">3D Sculpture Controls</span>
-                  <span id="theme-badge-label" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-500/15 text-indigo-600 dark:bg-cyan-400/15 dark:text-cyan-300">
-                    Obsidian Cyber
-                  </span>
-                </div>
-                <p class="text-xs opacity-75 leading-relaxed">
-                  Move cursor to orbit the 3D gyroscope or trigger kinetic modes below.
-                </p>
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                  <button id="btn-mode-orbit" type="button" onclick="setSculptureMode('orbit')"
-                    class="sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 transition-all">
-                    Orbit Mode
-                  </button>
-                  <button id="btn-mode-pulse" type="button" onclick="setSculptureMode('pulse')"
-                    class="sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-700 dark:bg-cyan-400/10 dark:hover:bg-cyan-400/20 dark:text-cyan-300 transition-all">
-                    Pulse Core
-                  </button>
-                  <button id="btn-mode-hyperspin" type="button" onclick="setSculptureMode('hyperspin')"
-                    class="sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-teal-600/10 hover:bg-teal-600/20 text-teal-700 dark:bg-violet-500/15 dark:hover:bg-violet-500/25 dark:text-violet-300 transition-all">
-                    Hyper-Spin
-                  </button>
-                  <button id="btn-kinetic-burst" type="button" onclick="triggerKineticBurst()"
-                    class="py-2 px-3 rounded-xl text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:bg-amber-400/15 dark:hover:bg-amber-400/25 dark:text-amber-300 transition-all">
-                    Kinetic Burst
-                  </button>
-                </div>
-              </div>
-
-              <!-- Quick GitHub Handle & Portal Links -->
-              <div class="space-y-2.5">
-                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] border border-slate-900/5 dark:border-white/5">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center bg-slate-900 text-white dark:bg-white dark:text-slate-950">
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                      </svg>
-                    </div>
-                    <div class="truncate">
-                      <div class="text-sm font-semibold truncate">github.com/mapurba</div>
-                      <div class="text-xs opacity-65 truncate">Apurba Mondal (@mapurba)</div>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-1.5 flex-shrink-0">
-                    <button type="button" onclick="copyText('https://github.com/mapurba', 'Copied https://github.com/mapurba')" title="Copy GitHub URL"
-                      class="p-2 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 text-xs font-semibold transition-colors">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                    </button>
-                    <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
-                      class="px-3 py-1.5 rounded-xl bg-indigo-600/15 dark:bg-cyan-400/15 text-indigo-600 dark:text-cyan-300 text-xs font-semibold hover:opacity-85 transition-opacity">
-                      Open
-                    </a>
-                  </div>
-                </div>
-
-                <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
-                  class="flex items-center justify-between p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:bg-white/80 dark:hover:bg-white/[0.08] border border-transparent hover:border-teal-500/30 dark:hover:border-cyan-400/30 transition-all group">
-                  <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-cyan-400/15 dark:text-cyan-400">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold">game.idemo.app</div>
-                      <div class="text-xs opacity-65">Hosted Web Games &amp; 3D Demos</div>
-                    </div>
-                  </div>
-                  <span class="text-xs font-semibold text-teal-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">Play &rarr;</span>
-                </a>
-              </div>
+          <!-- Right Side: Open Space for 3D Solar System + Compact Planet Telemetry Card (shown when a planet is focused) -->
+          <div class="lg:col-span-6 flex flex-col items-center lg:items-end justify-between min-h-[260px] sm:min-h-[340px] lg:min-h-[430px]">
+            <!-- Subtle Interactive Hint Pill -->
+            <div class="pointer-events-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel text-[11px] font-medium opacity-85">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>Drag to orbit &bull; Scroll/Pinch to zoom &bull; Click any planet to inspect</span>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- Tech Stack & Open-Source Marquee -->
-      <section class="py-5 border-y border-slate-900/5 dark:border-white/5 glass-panel overflow-hidden">
-        <div class="marquee-track flex items-center gap-9 text-xs sm:text-sm font-semibold tracking-wider uppercase opacity-75">
-          <span>local-copilot (TypeScript)</span>
-          <span>&bull;</span>
-          <span>agent-flow-public</span>
-          <span>&bull;</span>
-          <span>policy-slm</span>
-          <span>&bull;</span>
-          <span>netiq-driver-dtd</span>
-          <span>&bull;</span>
-          <span>RBAC Policy Engine (Java)</span>
-          <span>&bull;</span>
-          <span>DEAD-EARTH (Unity C#)</span>
-          <span>&bull;</span>
-          <span>IGI-2-Covert-Strike-Android</span>
-          <span>&bull;</span>
-          <span>angular-dynamic-forms</span>
-          <span>&bull;</span>
-          <span>Three.js &amp; WebGL2</span>
-          <span>&bull;</span>
-          <!-- Duplicate for seamless loop -->
-          <span>local-copilot (TypeScript)</span>
-          <span>&bull;</span>
-          <span>agent-flow-public</span>
-          <span>&bull;</span>
-          <span>policy-slm</span>
-          <span>&bull;</span>
-          <span>netiq-driver-dtd</span>
-          <span>&bull;</span>
-          <span>RBAC Policy Engine (Java)</span>
-          <span>&bull;</span>
-          <span>DEAD-EARTH (Unity C#)</span>
-          <span>&bull;</span>
-          <span>IGI-2-Covert-Strike-Android</span>
-          <span>&bull;</span>
-          <span>angular-dynamic-forms</span>
-          <span>&bull;</span>
-          <span>Three.js &amp; WebGL2</span>
-          <span>&bull;</span>
-        </div>
-      </section>
-
-      <!-- Prominent GitHub Developer Profile & Organizations Card -->
-      <section id="github-profile" class="pt-16 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="reveal glass-panel rounded-3xl p-6 sm:p-9 lg:p-10 relative overflow-hidden">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-
-            <!-- Profile Bio & Achievements -->
-            <div class="lg:col-span-7 space-y-5">
-              <div class="flex flex-wrap items-center gap-4">
-                <!-- Stylized Monogram Avatar -->
-                <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-600 via-violet-600 to-teal-500 dark:from-cyan-400 dark:via-blue-500 dark:to-violet-600 text-white dark:text-slate-950 font-display font-bold text-2xl shadow-xl">
-                  AM
-                </div>
+            <!-- Planet Astronomical Telemetry Card (Revealed on Planet Click/Selection) -->
+            <div id="planet-telemetry-card" class="hidden pointer-events-auto w-full max-w-sm glass-panel rounded-3xl p-5 space-y-3.5 border border-indigo-500/30 dark:border-cyan-400/35 shadow-2xl mt-auto">
+              <div class="flex items-start justify-between gap-3">
                 <div>
-                  <div class="flex flex-wrap items-center gap-2.5">
-                    <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-tight">Apurba Mondal</h2>
-                    <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
-                      class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-indigo-500/15 text-indigo-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:underline">
-                      @mapurba
-                    </a>
-                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300 border border-amber-500/25">
-                      GitHub Pro
-                    </span>
+                  <div class="flex items-center gap-2">
+                    <span id="telemetry-dot" class="w-3 h-3 rounded-full bg-cyan-400"></span>
+                    <span id="telemetry-type" class="text-[11px] font-mono uppercase tracking-wider opacity-70">Terrestrial Planet</span>
                   </div>
-                  <p class="text-xs sm:text-sm opacity-75 mt-1">
-                    Software Engineer at <strong>OpenText</strong> &bull; Creator of <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer" class="underline">www.idemo.app</a> &amp; <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer" class="underline">game.idemo.app</a> &bull; UTC +05:30
-                  </p>
+                  <h3 id="telemetry-name" class="font-display text-2xl font-bold mt-0.5">Earth</h3>
                 </div>
+                <button type="button" onclick="selectSolarBody('overview')"
+                  class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600/15 text-indigo-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:opacity-85 transition-opacity">
+                  Reset System View
+                </button>
               </div>
 
-              <!-- Quick Copy / Open Bar -->
-              <div class="flex flex-wrap items-center gap-2.5">
-                <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white dark:text-slate-950 bg-slate-900 dark:bg-white hover:opacity-90 transition-opacity">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                  </svg>
-                  <span>Visit github.com/mapurba</span>
-                </a>
+              <p id="telemetry-desc" class="text-xs opacity-80 leading-relaxed">
+                Our home world and the only known astronomical object harboring life, featuring liquid water oceans and a protective magnetosphere.
+              </p>
 
-                <button type="button" onclick="copyText('@mapurba', 'Copied handle @mapurba')"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-cyan-400/15 transition-colors">
-                  <span>Copy @mapurba</span>
-                </button>
-
-                <button type="button" onclick="copyText('https://github.com/mapurba', 'Copied https://github.com/mapurba')"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-cyan-400/15 transition-colors">
-                  <span>Copy Profile URL</span>
-                </button>
-
-                <a href="https://github.com/mapurba/idemo.app.github.io" target="_blank" rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-teal-500/15 text-teal-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:opacity-85 transition-opacity">
-                  <span>Source: idemo.app.github.io &nearr;</span>
-                </a>
-              </div>
-
-              <!-- GitHub Achievements -->
-              <div class="space-y-2">
-                <div class="text-[11px] font-semibold uppercase tracking-wider opacity-65">GitHub Achievements</div>
-                <div class="flex flex-wrap gap-2">
-                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
-                    Arctic Code Vault Contributor
-                  </a>
-                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
-                    Pull Shark x2
-                  </a>
-                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
-                    Pair Extraordinaire
-                  </a>
-                  <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
-                    Quickdraw
-                  </a>
+              <div class="grid grid-cols-2 gap-2.5 pt-1 text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-900/5 dark:bg-white/[0.04]">
+                  <div class="text-[10px] uppercase tracking-wider opacity-60">Distance from Sun</div>
+                  <div id="telemetry-distance" class="font-display font-bold mt-0.5">149.6M km (1 AU)</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900/5 dark:bg-white/[0.04]">
+                  <div class="text-[10px] uppercase tracking-wider opacity-60">Orbital Period</div>
+                  <div id="telemetry-period" class="font-display font-bold mt-0.5">365.25 Earth days</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900/5 dark:bg-white/[0.04]">
+                  <div class="text-[10px] uppercase tracking-wider opacity-60">Mean Radius</div>
+                  <div id="telemetry-radius" class="font-display font-bold mt-0.5">6,371 km</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900/5 dark:bg-white/[0.04]">
+                  <div class="text-[10px] uppercase tracking-wider opacity-60">Surface Temp / Moons</div>
+                  <div id="telemetry-temp-moons" class="font-display font-bold mt-0.5">15&deg;C &bull; 1 Moon</div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Organizations & Key Repositories -->
-            <div class="lg:col-span-5 space-y-4">
-              <div class="p-5 rounded-2xl bg-slate-900/5 dark:bg-white/[0.03] border border-slate-900/5 dark:border-white/5 space-y-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold uppercase tracking-wider opacity-75">GitHub Organizations</span>
-                  <span class="text-xs font-mono opacity-60">5 Active Orgs</span>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <a href="https://github.com/workspacer-in" target="_blank" rel="noopener noreferrer"
-                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
-                    @workspacer-in &nearr;
-                  </a>
-                  <a href="https://github.com/lastday-in" target="_blank" rel="noopener noreferrer"
-                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500/10 text-teal-700 dark:bg-violet-500/15 dark:text-violet-300 hover:bg-teal-500/20 dark:hover:bg-violet-500/25 transition-colors">
-                    @lastday-in &nearr;
-                  </a>
-                  <a href="https://github.com/lstdays" target="_blank" rel="noopener noreferrer"
-                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500/10 text-teal-700 dark:bg-violet-500/15 dark:text-violet-300 hover:bg-teal-500/20 dark:hover:bg-violet-500/25 transition-colors">
-                    @lstdays &nearr;
-                  </a>
-                  <a href="https://github.com/dynamic-components" target="_blank" rel="noopener noreferrer"
-                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
-                    @dynamic-components &nearr;
-                  </a>
-                  <a href="https://github.com/agentflow-stage" target="_blank" rel="noopener noreferrer"
-                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
-                    @agentflow-stage &nearr;
-                  </a>
-                </div>
-              </div>
+        <!-- Bottom Floating Planet Navigator & Zoom HUD -->
+        <div class="mt-8 lg:mt-10 pointer-events-auto">
+          <div class="glass-panel rounded-2xl p-2.5 sm:p-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            <!-- Scrollable Planet Selector Pills -->
+            <div id="planet-nav-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto py-0.5 px-1">
+              <button type="button" data-body="overview" onclick="selectSolarBody('overview')"
+                class="planet-pill active flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 transition-all">
+                Overview
+              </button>
+              <button type="button" data-body="sun" onclick="selectSolarBody('sun')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Sun
+              </button>
+              <button type="button" data-body="mercury" onclick="selectSolarBody('mercury')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Mercury
+              </button>
+              <button type="button" data-body="venus" onclick="selectSolarBody('venus')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Venus
+              </button>
+              <button type="button" data-body="earth" onclick="selectSolarBody('earth')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Earth
+              </button>
+              <button type="button" data-body="mars" onclick="selectSolarBody('mars')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Mars
+              </button>
+              <button type="button" data-body="jupiter" onclick="selectSolarBody('jupiter')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Jupiter
+              </button>
+              <button type="button" data-body="saturn" onclick="selectSolarBody('saturn')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Saturn
+              </button>
+              <button type="button" data-body="uranus" onclick="selectSolarBody('uranus')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Uranus
+              </button>
+              <button type="button" data-body="neptune" onclick="selectSolarBody('neptune')"
+                class="planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all">
+                Neptune
+              </button>
+            </div>
 
-              <div class="grid grid-cols-2 gap-3 text-xs">
-                <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer"
-                  class="p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:border-indigo-500/40 dark:hover:border-cyan-400/40 border border-transparent transition-all">
-                  <div class="font-display font-bold text-lg text-indigo-600 dark:text-cyan-400">71 Repositories</div>
-                  <div class="opacity-70 mt-0.5">Explore all on GitHub &rarr;</div>
-                </a>
-                <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
-                  class="p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:border-teal-500/40 dark:hover:border-violet-400/40 border border-transparent transition-all">
-                  <div class="font-display font-bold text-lg text-teal-600 dark:text-violet-400">game.idemo.app</div>
-                  <div class="opacity-70 mt-0.5">Live WebGL Arcade &rarr;</div>
-                </a>
-              </div>
+            <!-- Zoom & Orbit Speed Controls -->
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button type="button" onclick="adjustZoom(0.75)" title="Zoom In"
+                class="p-2 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 text-xs font-bold transition-colors" aria-label="Zoom In">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </button>
+              <button type="button" onclick="adjustZoom(1.33)" title="Zoom Out"
+                class="p-2 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 text-xs font-bold transition-colors" aria-label="Zoom Out">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </button>
+              <button id="btn-toggle-orbits" type="button" onclick="toggleOrbitSpeed()"
+                class="px-3 py-1.5 rounded-xl bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 text-xs font-semibold transition-colors">
+                Pause Orbits
+              </button>
+              <button id="btn-toggle-hud" type="button" onclick="toggleHeroFocus()"
+                class="px-3 py-1.5 rounded-xl bg-teal-500/15 text-teal-700 dark:bg-violet-500/20 dark:text-violet-300 hover:opacity-85 text-xs font-semibold transition-opacity">
+                Full Space View
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Interactive Ecosystem & GitHub Repositories Showcase -->
-      <section id="ecosystem" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="reveal text-center max-w-3xl mx-auto space-y-4 mb-10">
-          <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 dark:bg-cyan-400/10 dark:text-cyan-400">
-            github.com/mapurba &bull; idemo.app
-          </span>
-          <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
-            Featured <span class="gradient-text-light dark:gradient-text-dark">Repositories</span> &amp; Apps
-          </h2>
-          <p class="text-sm sm:text-base opacity-75">
-            Filter across AI Agents, Enterprise Identity &amp; IAM, 3D Web/Unity Games, and Micro-Frontends — or search by repository name, language, or stack.
-          </p>
-        </div>
+      <!-- Solid-Glass Content Backdrop Below Hero for Crisp Readability -->
+      <div class="relative z-10 pointer-events-auto bg-gradient-to-b from-transparent via-[var(--bg-primary)]/90 to-[var(--bg-primary)] pt-4">
 
-        <!-- Filter Tabs + Live Search Bar -->
-        <div class="reveal flex flex-col lg:flex-row items-center justify-between gap-4 mb-8">
-          <!-- Category Filter Tabs -->
-          <div class="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl glass-panel w-full lg:w-auto" role="tablist">
-            <button type="button" data-filter="all" onclick="filterProjects('all')"
-              class="filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 shadow-sm">
-              All (20)
-            </button>
-            <button type="button" data-filter="ai" onclick="filterProjects('ai')"
-              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
-              AI &amp; Agents (8)
-            </button>
-            <button type="button" data-filter="enterprise" onclick="filterProjects('enterprise')"
-              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
-              Enterprise &amp; IAM (6)
-            </button>
-            <button type="button" data-filter="games" onclick="filterProjects('games')"
-              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
-              Games &amp; 3D (3)
-            </button>
-            <button type="button" data-filter="microfrontends" onclick="filterProjects('microfrontends')"
-              class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
-              Micro-Frontends (3)
-            </button>
+        <!-- Tech Stack & Open-Source Marquee -->
+        <section class="py-5 border-y border-slate-900/5 dark:border-white/5 glass-panel overflow-hidden">
+          <div class="marquee-track flex items-center gap-9 text-xs sm:text-sm font-semibold tracking-wider uppercase opacity-75">
+            <span>local-copilot (TypeScript)</span>
+            <span>&bull;</span>
+            <span>agent-flow-public</span>
+            <span>&bull;</span>
+            <span>policy-slm</span>
+            <span>&bull;</span>
+            <span>netiq-driver-dtd</span>
+            <span>&bull;</span>
+            <span>RBAC Policy Engine (Java)</span>
+            <span>&bull;</span>
+            <span>DEAD-EARTH (Unity C#)</span>
+            <span>&bull;</span>
+            <span>IGI-2-Covert-Strike-Android</span>
+            <span>&bull;</span>
+            <span>angular-dynamic-forms</span>
+            <span>&bull;</span>
+            <span>Three.js &amp; WebGL2</span>
+            <span>&bull;</span>
+            <!-- Duplicate for seamless loop -->
+            <span>local-copilot (TypeScript)</span>
+            <span>&bull;</span>
+            <span>agent-flow-public</span>
+            <span>&bull;</span>
+            <span>policy-slm</span>
+            <span>&bull;</span>
+            <span>netiq-driver-dtd</span>
+            <span>&bull;</span>
+            <span>RBAC Policy Engine (Java)</span>
+            <span>&bull;</span>
+            <span>DEAD-EARTH (Unity C#)</span>
+            <span>&bull;</span>
+            <span>IGI-2-Covert-Strike-Android</span>
+            <span>&bull;</span>
+            <span>angular-dynamic-forms</span>
+            <span>&bull;</span>
+            <span>Three.js &amp; WebGL2</span>
+            <span>&bull;</span>
+          </div>
+        </section>
+
+        <!-- Prominent GitHub Developer Profile & Organizations Card -->
+        <section id="github-profile" class="pt-16 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div class="reveal glass-panel rounded-3xl p-6 sm:p-9 lg:p-10 relative overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+              <!-- Profile Bio & Achievements -->
+              <div class="lg:col-span-7 space-y-5">
+                <div class="flex flex-wrap items-center gap-4">
+                  <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-600 via-violet-600 to-teal-500 dark:from-cyan-400 dark:via-blue-500 dark:to-violet-600 text-white dark:text-slate-950 font-display font-bold text-2xl shadow-xl">
+                    AM
+                  </div>
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-tight">Apurba Mondal</h2>
+                      <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                        class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-indigo-500/15 text-indigo-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:underline">
+                        @mapurba
+                      </a>
+                      <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300 border border-amber-500/25">
+                        GitHub Pro
+                      </span>
+                    </div>
+                    <p class="text-xs sm:text-sm opacity-75 mt-1">
+                      Software Engineer at <strong>OpenText</strong> &bull; Creator of <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer" class="underline">www.idemo.app</a> &amp; <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer" class="underline">game.idemo.app</a> &bull; UTC +05:30
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Quick Copy / Open Bar -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white dark:text-slate-950 bg-slate-900 dark:bg-white hover:opacity-90 transition-opacity">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                    <span>Visit github.com/mapurba</span>
+                  </a>
+
+                  <button type="button" onclick="copyText('@mapurba', 'Copied handle @mapurba')"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-cyan-400/15 transition-colors">
+                    <span>Copy @mapurba</span>
+                  </button>
+
+                  <button type="button" onclick="copyText('https://github.com/mapurba', 'Copied https://github.com/mapurba')"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/5 dark:bg-white/10 hover:bg-indigo-500/15 dark:hover:bg-cyan-400/15 transition-colors">
+                    <span>Copy Profile URL</span>
+                  </button>
+
+                  <a href="https://github.com/mapurba/idemo.app.github.io" target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-teal-500/15 text-teal-700 dark:bg-cyan-400/15 dark:text-cyan-300 hover:opacity-85 transition-opacity">
+                    <span>Source: idemo.app.github.io &nearr;</span>
+                  </a>
+                </div>
+
+                <!-- GitHub Achievements -->
+                <div class="space-y-2">
+                  <div class="text-[11px] font-semibold uppercase tracking-wider opacity-65">GitHub Achievements</div>
+                  <div class="flex flex-wrap gap-2">
+                    <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                      Arctic Code Vault Contributor
+                    </a>
+                    <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                      Pull Shark x2
+                    </a>
+                    <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                      Pair Extraordinaire
+                    </a>
+                    <a href="https://github.com/mapurba?tab=achievements" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-900/5 dark:bg-white/5 hover:border-indigo-500/40 border border-transparent transition-colors">
+                      Quickdraw
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Organizations & Key Repositories -->
+              <div class="lg:col-span-5 space-y-4">
+                <div class="p-5 rounded-2xl bg-slate-900/5 dark:bg-white/[0.03] border border-slate-900/5 dark:border-white/5 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider opacity-75">GitHub Organizations</span>
+                    <span class="text-xs font-mono opacity-60">5 Active Orgs</span>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <a href="https://github.com/workspacer-in" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
+                      @workspacer-in &nearr;
+                    </a>
+                    <a href="https://github.com/lastday-in" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500/10 text-teal-700 dark:bg-violet-500/15 dark:text-violet-300 hover:bg-teal-500/20 dark:hover:bg-violet-500/25 transition-colors">
+                      @lastday-in &nearr;
+                    </a>
+                    <a href="https://github.com/lstdays" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500/10 text-teal-700 dark:bg-violet-500/15 dark:text-violet-300 hover:bg-teal-500/20 dark:hover:bg-violet-500/25 transition-colors">
+                      @lstdays &nearr;
+                    </a>
+                    <a href="https://github.com/dynamic-components" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
+                      @dynamic-components &nearr;
+                    </a>
+                    <a href="https://github.com/agentflow-stage" target="_blank" rel="noopener noreferrer"
+                      class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-700 dark:bg-cyan-400/10 dark:text-cyan-300 hover:bg-indigo-500/20 dark:hover:bg-cyan-400/20 transition-colors">
+                      @agentflow-stage &nearr;
+                    </a>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer"
+                    class="p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:border-indigo-500/40 dark:hover:border-cyan-400/40 border border-transparent transition-all">
+                    <div class="font-display font-bold text-lg text-indigo-600 dark:text-cyan-400">71 Repositories</div>
+                    <div class="opacity-70 mt-0.5">Explore all on GitHub &rarr;</div>
+                  </a>
+                  <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+                    class="p-3.5 rounded-2xl bg-white/50 dark:bg-white/[0.04] hover:border-teal-500/40 dark:hover:border-violet-400/40 border border-transparent transition-all">
+                    <div class="font-display font-bold text-lg text-teal-600 dark:text-violet-400">game.idemo.app</div>
+                    <div class="opacity-70 mt-0.5">Live WebGL Arcade &rarr;</div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Interactive Ecosystem & GitHub Repositories Showcase -->
+        <section id="ecosystem" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div class="reveal text-center max-w-3xl mx-auto space-y-4 mb-10">
+            <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 dark:bg-cyan-400/10 dark:text-cyan-400">
+              github.com/mapurba &bull; idemo.app
+            </span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
+              Featured <span class="gradient-text-light dark:gradient-text-dark">Repositories</span> &amp; Apps
+            </h2>
+            <p class="text-sm sm:text-base opacity-75">
+              Filter across AI Agents, Enterprise Identity &amp; IAM, 3D Web/Unity Games, and Micro-Frontends — or search by repository name, language, or stack.
+            </p>
           </div>
 
-          <!-- Live Search Input -->
-          <div class="relative w-full lg:w-80">
-            <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input id="repo-search" type="text" placeholder="Search repos (e.g. local-copilot, RBAC, C#)..."
-              oninput="handleSearchInput(this.value)"
-              class="w-full pl-10 pr-4 py-2.5 rounded-2xl glass-panel text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 transition-all" />
+          <!-- Filter Tabs + Live Search Bar -->
+          <div class="reveal flex flex-col lg:flex-row items-center justify-between gap-4 mb-8">
+            <div class="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl glass-panel w-full lg:w-auto" role="tablist">
+              <button type="button" data-filter="all" onclick="filterProjects('all')"
+                class="filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 shadow-sm">
+                All (20)
+              </button>
+              <button type="button" data-filter="ai" onclick="filterProjects('ai')"
+                class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+                AI &amp; Agents (8)
+              </button>
+              <button type="button" data-filter="enterprise" onclick="filterProjects('enterprise')"
+                class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+                Enterprise &amp; IAM (6)
+              </button>
+              <button type="button" data-filter="games" onclick="filterProjects('games')"
+                class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+                Games &amp; 3D (3)
+              </button>
+              <button type="button" data-filter="microfrontends" onclick="filterProjects('microfrontends')"
+                class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 opacity-75 hover:opacity-100">
+                Micro-Frontends (3)
+              </button>
+            </div>
+
+            <!-- Live Search Input -->
+            <div class="relative w-full lg:w-80">
+              <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="repo-search" type="text" placeholder="Search repos (e.g. local-copilot, RBAC, C#)..."
+                oninput="handleSearchInput(this.value)"
+                class="w-full pl-10 pr-4 py-2.5 rounded-2xl glass-panel text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 transition-all" />
+            </div>
           </div>
-        </div>
 
-        <!-- Project Cards Grid -->
-        <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <!-- Populated dynamically by JavaScript -->
-        </div>
+          <!-- Project Cards Grid -->
+          <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Populated dynamically by JavaScript -->
+          </div>
 
-        <!-- Empty Search Fallback -->
-        <div id="empty-search-state" class="hidden text-center py-14 glass-panel rounded-3xl mt-6 space-y-3">
-          <div class="font-display text-xl font-bold">No matching repositories found</div>
-          <p class="text-sm opacity-75">Try another keyword or explore all 71 repositories directly on GitHub.</p>
-          <div class="pt-2 flex justify-center gap-3">
-            <button type="button" onclick="resetFilters()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950">
-              Reset Filters
-            </button>
-            <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer"
-              class="px-4 py-2 rounded-xl text-xs font-semibold glass-panel">
-              Browse github.com/mapurba &nearr;
+          <!-- Empty Search Fallback -->
+          <div id="empty-search-state" class="hidden text-center py-14 glass-panel rounded-3xl mt-6 space-y-3">
+            <div class="font-display text-xl font-bold">No matching repositories found</div>
+            <p class="text-sm opacity-75">Try another keyword or explore all 71 repositories directly on GitHub.</p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button type="button" onclick="resetFilters()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950">
+                Reset Filters
+              </button>
+              <a href="https://github.com/mapurba?tab=repositories" target="_blank" rel="noopener noreferrer"
+                class="px-4 py-2 rounded-xl text-xs font-semibold glass-panel">
+                Browse github.com/mapurba &nearr;
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Engineering Pillars Bento Section -->
+        <section id="architecture" class="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div class="reveal mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div class="space-y-2.5 max-w-2xl">
+              <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-teal-500/10 text-teal-600 dark:bg-violet-500/15 dark:text-violet-300">
+                Engineering Pillars
+              </span>
+              <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">
+                From Autonomous LLM Agents to 3D Game Worlds
+              </h2>
+            </div>
+            <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+              class="text-xs sm:text-sm font-semibold text-indigo-600 dark:text-cyan-400 hover:underline">
+              Explore full commit graph on github.com/mapurba &rarr;
             </a>
           </div>
-        </div>
-      </section>
 
-      <!-- Engineering Pillars Bento Section -->
-      <section id="architecture" class="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="reveal mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div class="space-y-2.5 max-w-2xl">
-            <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-teal-500/10 text-teal-600 dark:bg-violet-500/15 dark:text-violet-300">
-              Engineering Pillars
-            </span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-              From Autonomous LLM Agents to 3D Game Worlds
-            </h2>
-          </div>
-          <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
-            class="text-xs sm:text-sm font-semibold text-indigo-600 dark:text-cyan-400 hover:underline">
-            Explore full commit graph on github.com/mapurba &rarr;
-          </a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <!-- Pillar 1 -->
-          <div class="reveal md:col-span-6 glass-panel rounded-3xl p-7 flex flex-col justify-between space-y-5">
-            <div class="flex items-center justify-between">
-              <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-indigo-500/15 text-indigo-600 dark:bg-cyan-400/15 dark:text-cyan-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4z"></path>
-                </svg>
-              </div>
-              <a href="https://github.com/mapurba/local-copilot" target="_blank" rel="noopener noreferrer" class="text-xs font-mono opacity-70 hover:opacity-100 underline">
-                mapurba/local-copilot &nearr;
-              </a>
-            </div>
-            <div class="space-y-2">
-              <h3 class="font-display text-xl font-bold">Local-First AI Copilots &amp; Agentic Workflows</h3>
-              <p class="text-sm opacity-75 leading-relaxed">
-                Privacy-preserving local LLM assistants (<code>local-copilot</code>, <code>ollamaApp</code>), structured extraction engines (<code>langextract</code>), and policy-aware small language models (<code>policy-slm</code>, <code>agent-flow-public</code>).
-              </p>
-            </div>
-          </div>
-
-          <!-- Pillar 2 -->
-          <div class="reveal md:col-span-6 glass-panel rounded-3xl p-7 flex flex-col justify-between space-y-5">
-            <div class="flex items-center justify-between">
-              <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-violet-500/20 dark:text-violet-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-              </div>
-              <a href="https://github.com/mapurba/RBAC" target="_blank" rel="noopener noreferrer" class="text-xs font-mono opacity-70 hover:opacity-100 underline">
-                mapurba/RBAC &nearr;
-              </a>
-            </div>
-            <div class="space-y-2">
-              <h3 class="font-display text-xl font-bold">Enterprise Identity, Drivers &amp; Access Governance</h3>
-              <p class="text-sm opacity-75 leading-relaxed">
-                Production-grade identity synchronization and policy enforcement built with <code>netiq-driver-dtd</code>, <code>driverforge</code>, Java policy-based <code>RBAC</code>, and resilient retry interceptors.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Contact & Collaboration Section -->
-      <section id="contact" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="reveal glass-panel rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div class="lg:col-span-6 space-y-5">
-            <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 dark:bg-cyan-400/10 dark:text-cyan-400">
-              Connect with @mapurba
-            </span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-              Collaborate on Enterprise Apps, AI Agents, or 3D Games
-            </h2>
-            <p class="text-sm sm:text-base opacity-75 leading-relaxed">
-              Reach out directly to <strong>Apurba Mondal</strong> via GitHub or send a message below to discuss enterprise software engineering, identity integrations, or interactive experiences on <strong>www.idemo.app</strong>.
-            </p>
-
-            <div class="space-y-3 pt-1 text-sm">
-              <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-3 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
-                <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-900/10 dark:bg-white/10">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Pillar 1 -->
+            <div class="reveal md:col-span-6 glass-panel rounded-3xl p-7 flex flex-col justify-between space-y-5">
+              <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-indigo-500/15 text-indigo-600 dark:bg-cyan-400/15 dark:text-cyan-400">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-8a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4z"></path>
                   </svg>
-                </span>
-                <span>GitHub: <strong>https://github.com/mapurba</strong></span>
-              </a>
+                </div>
+                <a href="https://github.com/mapurba/local-copilot" target="_blank" rel="noopener noreferrer" class="text-xs font-mono opacity-70 hover:opacity-100 underline">
+                  mapurba/local-copilot &nearr;
+                </a>
+              </div>
+              <div class="space-y-2">
+                <h3 class="font-display text-xl font-bold">Local-First AI Copilots &amp; Agentic Workflows</h3>
+                <p class="text-sm opacity-75 leading-relaxed">
+                  Privacy-preserving local LLM assistants (<code>local-copilot</code>, <code>ollamaApp</code>), structured extraction engines (<code>langextract</code>), and policy-aware small language models (<code>policy-slm</code>, <code>agent-flow-public</code>).
+                </p>
+              </div>
+            </div>
 
-              <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-3 hover:text-teal-600 dark:hover:text-cyan-400 transition-colors">
-                <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-cyan-400/15 dark:text-cyan-400">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                </span>
-                <span>Games Arcade: <strong>https://game.idemo.app/</strong></span>
-              </a>
-
-              <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-3 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
-                <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-500/15 text-indigo-600 dark:bg-violet-500/20 dark:text-violet-300">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path></svg>
-                </span>
-                <span>Primary Domain: <strong>https://www.idemo.app</strong></span>
-              </a>
+            <!-- Pillar 2 -->
+            <div class="reveal md:col-span-6 glass-panel rounded-3xl p-7 flex flex-col justify-between space-y-5">
+              <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-violet-500/20 dark:text-violet-300">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                </div>
+                <a href="https://github.com/mapurba/RBAC" target="_blank" rel="noopener noreferrer" class="text-xs font-mono opacity-70 hover:opacity-100 underline">
+                  mapurba/RBAC &nearr;
+                </a>
+              </div>
+              <div class="space-y-2">
+                <h3 class="font-display text-xl font-bold">Enterprise Identity, Drivers &amp; Access Governance</h3>
+                <p class="text-sm opacity-75 leading-relaxed">
+                  Production-grade identity synchronization and policy enforcement built with <code>netiq-driver-dtd</code>, <code>driverforge</code>, Java policy-based <code>RBAC</code>, and resilient retry interceptors.
+                </p>
+              </div>
             </div>
           </div>
+        </section>
 
-          <!-- Contact Form -->
-          <div class="lg:col-span-6">
-            <form id="contact-form" class="space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label for="name" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Your Name</label>
-                  <input type="text" id="name" required placeholder="Jane Doe"
-                    class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all" />
+        <!-- Contact & Collaboration Section -->
+        <section id="contact" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div class="reveal glass-panel rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div class="lg:col-span-6 space-y-5">
+              <span class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 dark:bg-cyan-400/10 dark:text-cyan-400">
+                Connect with @mapurba
+              </span>
+              <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">
+                Collaborate on Enterprise Apps, AI Agents, or 3D Games
+              </h2>
+              <p class="text-sm sm:text-base opacity-75 leading-relaxed">
+                Reach out directly to <strong>Apurba Mondal</strong> via GitHub or send a message below to discuss enterprise software engineering, identity integrations, or interactive experiences on <strong>www.idemo.app</strong>.
+              </p>
+
+              <div class="space-y-3 pt-1 text-sm">
+                <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer"
+                  class="flex items-center gap-3 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+                  <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-900/10 dark:bg-white/10">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                  </span>
+                  <span>GitHub: <strong>https://github.com/mapurba</strong></span>
+                </a>
+
+                <a href="https://game.idemo.app/" target="_blank" rel="noopener noreferrer"
+                  class="flex items-center gap-3 hover:text-teal-600 dark:hover:text-cyan-400 transition-colors">
+                  <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-teal-500/15 text-teal-600 dark:bg-cyan-400/15 dark:text-cyan-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  </span>
+                  <span>Games Arcade: <strong>https://game.idemo.app/</strong></span>
+                </a>
+
+                <a href="https://www.idemo.app" target="_blank" rel="noopener noreferrer"
+                  class="flex items-center gap-3 hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+                  <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-500/15 text-indigo-600 dark:bg-violet-500/20 dark:text-violet-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path></svg>
+                  </span>
+                  <span>Primary Domain: <strong>https://www.idemo.app</strong></span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="lg:col-span-6">
+              <form id="contact-form" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="name" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Your Name</label>
+                    <input type="text" id="name" required placeholder="Jane Doe"
+                      class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all" />
+                  </div>
+                  <div>
+                    <label for="email" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Email Address</label>
+                    <input type="email" id="email" required placeholder="jane@organization.com"
+                      class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all" />
+                  </div>
                 </div>
+
                 <div>
-                  <label for="email" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Email Address</label>
-                  <input type="email" id="email" required placeholder="jane@organization.com"
-                    class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all" />
+                  <label for="topic" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Inquiry Area</label>
+                  <select id="topic"
+                    class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-slate-900/90 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all">
+                    <option value="Enterprise Software & IAM">Enterprise Software &amp; Identity Management</option>
+                    <option value="AI Agents & Local Copilots">AI Agents, SLMs &amp; Local Copilots</option>
+                    <option value="WebGL & 3D Games">WebGL &amp; 3D Games (game.idemo.app)</option>
+                    <option value="Open Source Collaboration">Open Source Collaboration (@mapurba)</option>
+                  </select>
                 </div>
-              </div>
 
-              <div>
-                <label for="topic" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Inquiry Area</label>
-                <select id="topic"
-                  class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-slate-900/90 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all">
-                  <option value="Enterprise Software & IAM">Enterprise Software &amp; Identity Management</option>
-                  <option value="AI Agents & Local Copilots">AI Agents, SLMs &amp; Local Copilots</option>
-                  <option value="WebGL & 3D Games">WebGL &amp; 3D Games (game.idemo.app)</option>
-                  <option value="Open Source Collaboration">Open Source Collaboration (@mapurba)</option>
-                </select>
-              </div>
+                <div>
+                  <label for="message" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Message</label>
+                  <textarea id="message" rows="3" required placeholder="Share your project idea, repository question, or collaboration scope..."
+                    class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all"></textarea>
+                </div>
 
-              <div>
-                <label for="message" class="block text-xs font-semibold uppercase tracking-wider opacity-75 mb-1.5">Message</label>
-                <textarea id="message" rows="3" required placeholder="Share your project idea, repository question, or collaboration scope..."
-                  class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-300/70 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 text-sm transition-all"></textarea>
-              </div>
+                <button type="submit"
+                  class="w-full py-3.5 px-6 rounded-xl font-semibold text-sm text-white dark:text-slate-950 bg-indigo-600 hover:bg-indigo-700 dark:bg-cyan-400 dark:hover:bg-cyan-300 shadow-lg shadow-indigo-500/20 dark:shadow-cyan-400/20 transition-all duration-300 hover:-translate-y-0.5">
+                  Send Message to Apurba Mondal
+                </button>
 
-              <button type="submit"
-                class="w-full py-3.5 px-6 rounded-xl font-semibold text-sm text-white dark:text-slate-950 bg-indigo-600 hover:bg-indigo-700 dark:bg-cyan-400 dark:hover:bg-cyan-300 shadow-lg shadow-indigo-500/20 dark:shadow-cyan-400/20 transition-all duration-300 hover:-translate-y-0.5">
-                Send Message to Apurba Mondal
-              </button>
-
-              <div id="form-feedback" class="hidden p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-medium">
-                Message recorded! You can also open an issue or discussion directly at <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer" class="underline font-bold">github.com/mapurba</a>.
-              </div>
-            </form>
+                <div id="form-feedback" class="hidden p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-medium">
+                  Message recorded! You can also open an issue or discussion directly at <a href="https://github.com/mapurba" target="_blank" rel="noopener noreferrer" class="underline font-bold">github.com/mapurba</a>.
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-900/10 dark:border-white/10 glass-panel mt-auto">
+    <footer class="border-t border-slate-900/10 dark:border-white/10 glass-panel mt-auto pointer-events-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-600 to-teal-500 dark:from-cyan-400 dark:to-violet-600 text-white dark:text-slate-950 font-display font-bold text-sm">
@@ -862,7 +979,7 @@
     </div>
   </div>
 
-  <!-- Application Data, Interactive UI & Three.js 3D Kinetic Engine -->
+  <!-- Application Data, Interactive UI & Three.js 3D Solar System Engine -->
   <script>
     // =========================================================================
     // 1. REAL GITHUB REPOSITORIES & APPS FOR APURBA MONDAL (@mapurba)
@@ -1416,248 +1533,800 @@
     }
 
     // =========================================================================
-    // 5. THREE.JS 60FPS KINETIC SCULPTURE ENGINE (OBSIDIAN CYBER & ALABASTER PRISM)
+    // 5. THREE.JS 3D INTERACTIVE SOLAR SYSTEM ENGINE
     // =========================================================================
-    let scene, camera, renderer, coreGroup, innerCore, outerWireframe, ring1, ring2, ring3, particlesMesh;
-    let pointLight1, pointLight2, ambientLight;
-    let mouseX = 0, mouseY = 0;
-    let targetMouseX = 0, targetMouseY = 0;
-    let kineticBurst = 0;
-    let sculptureMode = 'orbit'; // 'orbit' | 'pulse' | 'hyperspin'
+    let scene, camera, renderer, controls, solarGroup, asteroidBelt;
+    let sunMesh, sunGlowSprite, sunPointLight, ambientLight;
+    let orbitsPaused = false;
+    let heroFocusMode = false;
+    let activeBodyKey = 'overview';
+    let isCameraTransitioning = false;
+    let desiredCamOffset = new THREE.Vector3(16, 19, 34);
+    let lastTrackedPos = new THREE.Vector3(0, 0, 0);
 
-    const THEME_COLORS = {
-      dark: {
-        coreColor: 0x0b132b,
-        coreEmissive: 0x00f0ff,
-        wireColor: 0x8b5cf6,
-        ring1Color: 0x00f0ff,
-        ring2Color: 0x8b5cf6,
-        ring3Color: 0x38bdf8,
-        particleColor: 0x38bdf8,
-        light1: 0x00f0ff,
-        light2: 0x8b5cf6,
-        fogColor: 0x06080f
+    const solarBodies = {};
+    const clickableMeshes = [];
+    const labelElements = {};
+
+    const PLANET_SPECS = [
+      {
+        key: 'sun',
+        name: 'Sun',
+        type: 'G-Type Main-Sequence Star',
+        colorHex: '#fdb813',
+        radius: 3.1,
+        distance: 0,
+        orbitSpeed: 0,
+        rotSpeed: 0.004,
+        tilt: 0.12,
+        zoomDist: 10.5,
+        distanceText: '0 km (Solar Center)',
+        periodText: '230M yrs (Galactic)',
+        radiusText: '696,340 km (109x Earth)',
+        tempMoonsText: '5,500°C Surface • 8 Planets',
+        desc: 'The gravitational anchor of our Solar System, generating energy through core thermonuclear fusion of hydrogen into helium.'
       },
-      light: {
-        coreColor: 0xe0e7ff,
-        coreEmissive: 0x4f46e5,
-        wireColor: 0x0d9488,
-        ring1Color: 0x4f46e5,
-        ring2Color: 0x0d9488,
-        ring3Color: 0x2563eb,
-        particleColor: 0x4f46e5,
-        light1: 0x4f46e5,
-        light2: 0x0d9488,
-        fogColor: 0xf8fafc
+      {
+        key: 'mercury',
+        name: 'Mercury',
+        type: 'Terrestrial Planet',
+        colorHex: '#b5b5b5',
+        radius: 0.42,
+        distance: 5.5,
+        orbitSpeed: 0.022,
+        rotSpeed: 0.008,
+        tilt: 0.03,
+        zoomDist: 2.2,
+        distanceText: '57.9M km (0.39 AU)',
+        periodText: '88 Earth days',
+        radiusText: '2,439.7 km',
+        tempMoonsText: '167°C Mean • 0 Moons',
+        desc: 'The smallest and innermost planet in the Solar System, scarred by ancient impact basins and extreme day-night temperature swings.'
+      },
+      {
+        key: 'venus',
+        name: 'Venus',
+        type: 'Terrestrial Planet',
+        colorHex: '#e6b86a',
+        radius: 0.68,
+        distance: 8.0,
+        orbitSpeed: 0.016,
+        rotSpeed: -0.005,
+        tilt: 3.09,
+        zoomDist: 2.9,
+        distanceText: '108.2M km (0.72 AU)',
+        periodText: '224.7 Earth days',
+        radiusText: '6,051.8 km',
+        tempMoonsText: '464°C • 0 Moons',
+        desc: 'Shrouded in dense sulfuric acid clouds with a runaway greenhouse atmosphere, making it the hottest planet in our Solar System.'
+      },
+      {
+        key: 'earth',
+        name: 'Earth',
+        type: 'Terrestrial Planet',
+        colorHex: '#38bdf8',
+        radius: 0.75,
+        distance: 11.2,
+        orbitSpeed: 0.012,
+        rotSpeed: 0.018,
+        tilt: 0.41,
+        zoomDist: 3.1,
+        hasMoon: true,
+        distanceText: '149.6M km (1.00 AU)',
+        periodText: '365.25 Earth days',
+        radiusText: '6,371 km',
+        tempMoonsText: '15°C • 1 Moon (Luna)',
+        desc: 'Our home world and the only known astronomical object harboring life, featuring liquid water oceans, dynamic weather, and a protective magnetosphere.'
+      },
+      {
+        key: 'mars',
+        name: 'Mars',
+        type: 'Terrestrial Planet',
+        colorHex: '#e05a36',
+        radius: 0.54,
+        distance: 14.5,
+        orbitSpeed: 0.0095,
+        rotSpeed: 0.017,
+        tilt: 0.44,
+        zoomDist: 2.5,
+        distanceText: '227.9M km (1.52 AU)',
+        periodText: '687 Earth days',
+        radiusText: '3,389.5 km',
+        tempMoonsText: '-65°C • 2 Moons',
+        desc: 'The Red Planet, colored by iron oxide dust and home to Olympus Mons—the tallest volcano in the Solar System—and Valles Marineris.'
+      },
+      {
+        key: 'jupiter',
+        name: 'Jupiter',
+        type: 'Gas Giant',
+        colorHex: '#d8a675',
+        radius: 1.75,
+        distance: 20.5,
+        orbitSpeed: 0.0055,
+        rotSpeed: 0.032,
+        tilt: 0.05,
+        zoomDist: 6.2,
+        hasGalileanMoons: true,
+        distanceText: '778.5M km (5.20 AU)',
+        periodText: '11.86 Earth years',
+        radiusText: '69,911 km (11x Earth)',
+        tempMoonsText: '-110°C • 95 Moons',
+        desc: 'The largest planet in our Solar System, featuring swirling ammonia cloud bands, the Great Red Spot storm, and four large Galilean moons.'
+      },
+      {
+        key: 'saturn',
+        name: 'Saturn',
+        type: 'Gas Giant',
+        colorHex: '#ead098',
+        radius: 1.48,
+        distance: 27.0,
+        orbitSpeed: 0.004,
+        rotSpeed: 0.028,
+        tilt: 0.47,
+        zoomDist: 6.4,
+        hasRings: true,
+        distanceText: '1.43B km (9.58 AU)',
+        periodText: '29.45 Earth years',
+        radiusText: '58,232 km',
+        tempMoonsText: '-140°C • 146 Moons',
+        desc: 'Adorned with a breathtaking system of icy rings spanning hundreds of thousands of kilometers, composed of countless ice and rock particles.'
+      },
+      {
+        key: 'uranus',
+        name: 'Uranus',
+        type: 'Ice Giant',
+        colorHex: '#7de3f4',
+        radius: 1.05,
+        distance: 33.2,
+        orbitSpeed: 0.0028,
+        rotSpeed: -0.02,
+        tilt: 1.71,
+        zoomDist: 4.3,
+        hasFaintRing: true,
+        distanceText: '2.87B km (19.2 AU)',
+        periodText: '84 Earth years',
+        radiusText: '25,362 km',
+        tempMoonsText: '-195°C • 28 Moons',
+        desc: 'An ice giant rich in water, ammonia, and methane ices that rotates nearly on its side with an extreme 98-degree axial tilt.'
+      },
+      {
+        key: 'neptune',
+        name: 'Neptune',
+        type: 'Ice Giant',
+        colorHex: '#3b66f5',
+        radius: 1.02,
+        distance: 38.8,
+        orbitSpeed: 0.0021,
+        rotSpeed: 0.022,
+        tilt: 0.49,
+        zoomDist: 4.2,
+        distanceText: '4.50B km (30.1 AU)',
+        periodText: '164.8 Earth years',
+        radiusText: '24,622 km',
+        tempMoonsText: '-200°C • 16 Moons',
+        desc: 'The outermost major planet, a deep azure ice giant whipped by supersonic winds reaching over 2,100 kilometers per hour.'
       }
-    };
+    ];
 
-    function initThreeScene() {
-      const canvas = document.getElementById('webgl-canvas');
+    // Procedural Canvas Textures for Rich Planetary Detail (Zero external image URLs)
+    function createPlanetTexture(key) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+
+      if (key === 'sun') {
+        const grad = ctx.createRadialGradient(256, 128, 10, 256, 128, 260);
+        grad.addColorStop(0, '#fff7cc');
+        grad.addColorStop(0.5, '#ffbe2e');
+        grad.addColorStop(1, '#f97316');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 256);
+        for (let i = 0; i < 450; i++) {
+          ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,220,0.22)' : 'rgba(234,88,12,0.22)';
+          ctx.beginPath();
+          ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 14 + 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (key === 'mercury') {
+        ctx.fillStyle = '#9ca3af';
+        ctx.fillRect(0, 0, 512, 256);
+        for (let i = 0; i < 240; i++) {
+          ctx.fillStyle = i % 2 === 0 ? 'rgba(75,85,99,0.35)' : 'rgba(209,213,219,0.25)';
+          ctx.beginPath();
+          ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 9 + 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (key === 'venus') {
+        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#d99b52');
+        grad.addColorStop(0.3, '#f3cf8a');
+        grad.addColorStop(0.6, '#dfa55d');
+        grad.addColorStop(1, '#c8863b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 256);
+        for (let y = 0; y < 256; y += 6) {
+          ctx.fillStyle = 'rgba(255,244,214,0.14)';
+          ctx.fillRect(0, y, 512, 2 + Math.sin(y * 0.15) * 2);
+        }
+      } else if (key === 'earth') {
+        // Deep Ocean Base
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fillRect(0, 0, 512, 256);
+        // Stylized Continents
+        const continents = [
+          [110, 80, 42, 30], [135, 145, 30, 45], [260, 75, 48, 32],
+          [285, 130, 35, 46], [365, 85, 65, 38], [415, 165, 32, 24]
+        ];
+        continents.forEach(([cx, cy, rx, ry]) => {
+          ctx.fillStyle = '#16a34a';
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0.25, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#65a30d';
+          ctx.beginPath();
+          ctx.ellipse(cx + 6, cy - 4, rx * 0.55, ry * 0.55, -0.2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        // Polar Ice Caps
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, 512, 16);
+        ctx.fillRect(0, 240, 512, 16);
+      } else if (key === 'mars') {
+        ctx.fillStyle = '#c2410c';
+        ctx.fillRect(0, 0, 512, 256);
+        for (let i = 0; i < 160; i++) {
+          ctx.fillStyle = i % 2 === 0 ? 'rgba(124,45,18,0.35)' : 'rgba(251,146,60,0.25)';
+          ctx.beginPath();
+          ctx.ellipse(Math.random() * 512, Math.random() * 256, Math.random() * 24 + 5, Math.random() * 10 + 3, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = 'rgba(248,250,252,0.85)';
+        ctx.fillRect(0, 0, 512, 12);
+        ctx.fillRect(0, 244, 512, 12);
+      } else if (key === 'jupiter') {
+        const bands = ['#c89b6e', '#f3e5d0', '#b87444', '#e8d0b3', '#9c5a34', '#eedbc2', '#c4895a', '#f5ead8'];
+        const bandH = 256 / bands.length;
+        bands.forEach((c, idx) => {
+          ctx.fillStyle = c;
+          ctx.fillRect(0, idx * bandH, 512, bandH + 1);
+        });
+        // Great Red Spot
+        ctx.fillStyle = '#b9381e';
+        ctx.beginPath();
+        ctx.ellipse(330, 162, 28, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#f8e6d0';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      } else if (key === 'saturn') {
+        const bands = ['#d9be82', '#f5e7c1', '#cbb074', '#efe0b9', '#bfa266', '#f2e3bc'];
+        const bandH = 256 / bands.length;
+        bands.forEach((c, idx) => {
+          ctx.fillStyle = c;
+          ctx.fillRect(0, idx * bandH, 512, bandH + 1);
+        });
+      } else if (key === 'uranus') {
+        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#67e8f9');
+        grad.addColorStop(0.5, '#a5f3fc');
+        grad.addColorStop(1, '#22d3ee');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 256);
+      } else if (key === 'neptune') {
+        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#1d4ed8');
+        grad.addColorStop(0.45, '#3b82f6');
+        grad.addColorStop(0.75, '#1e40af');
+        grad.addColorStop(1, '#2563eb');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 256);
+        ctx.fillStyle = 'rgba(147,197,253,0.28)';
+        ctx.fillRect(0, 92, 512, 8);
+        ctx.fillRect(0, 158, 512, 6);
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      return texture;
+    }
+
+    function createRingTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, 512, 0);
+      grad.addColorStop(0.0, 'rgba(215, 190, 140, 0.0)');
+      grad.addColorStop(0.15, 'rgba(215, 190, 140, 0.45)');
+      grad.addColorStop(0.32, 'rgba(245, 228, 188, 0.88)');
+      grad.addColorStop(0.52, 'rgba(185, 158, 112, 0.22)'); // Cassini division
+      grad.addColorStop(0.62, 'rgba(238, 218, 178, 0.82)');
+      grad.addColorStop(0.88, 'rgba(205, 180, 134, 0.45)');
+      grad.addColorStop(1.0, 'rgba(205, 180, 134, 0.0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 64);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function createGlowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createRadialGradient(128, 128, 12, 128, 128, 128);
+      grad.addColorStop(0, 'rgba(255, 240, 175, 1)');
+      grad.addColorStop(0.28, 'rgba(255, 185, 55, 0.65)');
+      grad.addColorStop(0.62, 'rgba(249, 115, 22, 0.18)');
+      grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 256, 256);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function initSolarSystem() {
+      const canvas = document.getElementById('solar-canvas');
+      const labelsLayer = document.getElementById('planet-labels-layer');
       scene = new THREE.Scene();
 
       const isDark = document.documentElement.classList.contains('dark');
-      const palette = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
-      scene.fog = new THREE.FogExp2(palette.fogColor, 0.032);
+      scene.fog = new THREE.FogExp2(isDark ? 0x04060d : 0xeef2f9, 0.0042);
 
-      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 0, 11.5);
+      camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 400);
+      camera.position.set(16, 19, 34);
 
       renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Lights
-      ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      // OrbitControls for Drag-to-Orbit, Scroll/Pinch-to-Zoom, and Pan
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.minDistance = 1.6;
+      controls.maxDistance = 95;
+      controls.target.set(-3.5, 0, 0);
+      controls.addEventListener('start', () => {
+        isCameraTransitioning = false;
+      });
+
+      // Solar Lighting
+      ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 0.34 : 0.72);
       scene.add(ambientLight);
 
-      pointLight1 = new THREE.PointLight(palette.light1, 2.5, 32);
-      pointLight1.position.set(6, 5, 7);
-      scene.add(pointLight1);
+      sunPointLight = new THREE.PointLight(0xfff1d0, 2.6, 160, 0.6);
+      sunPointLight.position.set(0, 0, 0);
+      scene.add(sunPointLight);
 
-      pointLight2 = new THREE.PointLight(palette.light2, 2.3, 32);
-      pointLight2.position.set(-6, -5, 6);
-      scene.add(pointLight2);
+      solarGroup = new THREE.Group();
+      scene.add(solarGroup);
 
-      // Kinetic Sculpture Group
-      coreGroup = new THREE.Group();
-      scene.add(coreGroup);
-
-      // 1. Inner Faceted Crystalline Core
-      const coreGeo = new THREE.IcosahedronGeometry(2.0, 1);
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: palette.coreColor,
-        emissive: palette.coreEmissive,
-        emissiveIntensity: isDark ? 0.36 : 0.18,
-        roughness: 0.22,
-        metalness: 0.88,
-        flatShading: true
-      });
-      innerCore = new THREE.Mesh(coreGeo, coreMat);
-      coreGroup.add(innerCore);
-
-      // 2. Geodesic Wireframe Shell
-      const wireGeo = new THREE.IcosahedronGeometry(2.65, 2);
-      const wireMat = new THREE.MeshBasicMaterial({
-        color: palette.wireColor,
-        wireframe: true,
-        transparent: true,
-        opacity: isDark ? 0.34 : 0.24
-      });
-      outerWireframe = new THREE.Mesh(wireGeo, wireMat);
-      coreGroup.add(outerWireframe);
-
-      // 3. Three Intersecting Gyroscopic Rings
-      const ring1Geo = new THREE.TorusGeometry(3.45, 0.025, 16, 120);
-      ring1 = new THREE.Mesh(ring1Geo, new THREE.MeshBasicMaterial({ color: palette.ring1Color, transparent: true, opacity: 0.6 }));
-      ring1.rotation.x = Math.PI / 3;
-      coreGroup.add(ring1);
-
-      const ring2Geo = new THREE.TorusGeometry(4.0, 0.02, 16, 120);
-      ring2 = new THREE.Mesh(ring2Geo, new THREE.MeshBasicMaterial({ color: palette.ring2Color, transparent: true, opacity: 0.5 }));
-      ring2.rotation.y = Math.PI / 4;
-      coreGroup.add(ring2);
-
-      const ring3Geo = new THREE.TorusGeometry(4.55, 0.018, 16, 120);
-      ring3 = new THREE.Mesh(ring3Geo, new THREE.MeshBasicMaterial({ color: palette.ring3Color, transparent: true, opacity: 0.4 }));
-      ring3.rotation.x = -Math.PI / 3.5;
-      ring3.rotation.y = -Math.PI / 5;
-      coreGroup.add(ring3);
-
-      // Orbiting Data Nodes on Ring 1
-      const nodeGeo = new THREE.SphereGeometry(0.11, 16, 16);
-      const nodeMat = new THREE.MeshBasicMaterial({ color: palette.ring1Color });
-      for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * Math.PI * 2;
-        const node = new THREE.Mesh(nodeGeo, nodeMat);
-        node.position.set(Math.cos(angle) * 3.45, Math.sin(angle) * 3.45, 0);
-        ring1.add(node);
+      // Deep Space Starfield
+      const starCount = 1800;
+      const starPositions = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount * 3; i += 3) {
+        const r = 75 + Math.random() * 140;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        starPositions[i] = r * Math.sin(phi) * Math.cos(theta);
+        starPositions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+        starPositions[i + 2] = r * Math.cos(phi);
       }
-
-      // 4. Ambient Particle Field
-      const particleCount = 480;
-      const posArray = new Float32Array(particleCount * 3);
-      for (let i = 0; i < particleCount * 3; i++) {
-        posArray[i] = (Math.random() - 0.5) * 30;
-      }
-      const particlesGeo = new THREE.BufferGeometry();
-      particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-      particlesMesh = new THREE.Points(particlesGeo, new THREE.PointsMaterial({
-        size: 0.06,
-        color: palette.particleColor,
+      const starsGeo = new THREE.BufferGeometry();
+      starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+      const starsMat = new THREE.PointsMaterial({
+        size: 0.32,
+        color: isDark ? 0xcbd5e1 : 0x6366f1,
         transparent: true,
-        opacity: isDark ? 0.68 : 0.45
+        opacity: isDark ? 0.85 : 0.45
+      });
+      scene.add(new THREE.Points(starsGeo, starsMat));
+
+      // Build Sun & All 8 Planets
+      const ringTexture = createRingTexture();
+
+      PLANET_SPECS.forEach((spec, idx) => {
+        const orbitPivot = new THREE.Group();
+        const initialAngle = idx * 0.85 + 0.4;
+        orbitPivot.rotation.y = initialAngle;
+        solarGroup.add(orbitPivot);
+
+        const bodyHolder = new THREE.Group();
+        bodyHolder.position.set(spec.distance, 0, 0);
+        orbitPivot.add(bodyHolder);
+
+        const tex = createPlanetTexture(spec.key);
+        const geo = new THREE.SphereGeometry(spec.radius, 48, 48);
+        const mat = spec.key === 'sun'
+          ? new THREE.MeshBasicMaterial({ map: tex })
+          : new THREE.MeshStandardMaterial({
+              map: tex,
+              roughness: 0.72,
+              metalness: 0.08
+            });
+
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.rotation.z = spec.tilt;
+        mesh.userData = { bodyKey: spec.key };
+        bodyHolder.add(mesh);
+        clickableMeshes.push(mesh);
+
+        // Sun Corona Glow Sprite
+        if (spec.key === 'sun') {
+          const spriteMat = new THREE.SpriteMaterial({
+            map: createGlowTexture(),
+            color: 0xffcc55,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+          sunGlowSprite = new THREE.Sprite(spriteMat);
+          sunGlowSprite.scale.set(13.5, 13.5, 1);
+          bodyHolder.add(sunGlowSprite);
+        }
+
+        // Earth's Atmosphere & Orbiting Moon
+        let moonPivot = null;
+        if (spec.hasMoon) {
+          const atmoGeo = new THREE.SphereGeometry(spec.radius * 1.05, 32, 32);
+          const atmoMat = new THREE.MeshBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.16
+          });
+          bodyHolder.add(new THREE.Mesh(atmoGeo, atmoMat));
+
+          moonPivot = new THREE.Group();
+          bodyHolder.add(moonPivot);
+          const moonMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.2, 24, 24),
+            new THREE.MeshStandardMaterial({ color: 0xd1d5db, roughness: 0.9 })
+          );
+          moonMesh.position.set(1.45, 0.12, 0);
+          moonPivot.add(moonMesh);
+        }
+
+        // Jupiter's 4 Galilean Moons
+        let galileanPivots = [];
+        if (spec.hasGalileanMoons) {
+          [2.4, 2.9, 3.45, 4.0].forEach((mDist, mIdx) => {
+            const mp = new THREE.Group();
+            mp.rotation.y = mIdx * 1.5;
+            bodyHolder.add(mp);
+            const mm = new THREE.Mesh(
+              new THREE.SphereGeometry(0.11 + (mIdx === 2 ? 0.05 : 0), 16, 16),
+              new THREE.MeshStandardMaterial({ color: 0xe5e7eb, roughness: 0.8 })
+            );
+            mm.position.set(mDist, 0, 0);
+            mp.add(mm);
+            galileanPivots.push({ pivot: mp, speed: 0.045 - mIdx * 0.007 });
+          });
+        }
+
+        // Saturn's Iconic Rings
+        if (spec.hasRings) {
+          const ringGeo = new THREE.RingGeometry(spec.radius * 1.32, spec.radius * 2.45, 96);
+          const pos = ringGeo.attributes.position;
+          const uv = ringGeo.attributes.uv;
+          const v3 = new THREE.Vector3();
+          for (let i = 0; i < pos.count; i++) {
+            v3.fromBufferAttribute(pos, i);
+            const len = v3.length();
+            const u = (len - spec.radius * 1.32) / (spec.radius * (2.45 - 1.32));
+            uv.setXY(i, u, 0.5);
+          }
+          const ringMat = new THREE.MeshBasicMaterial({
+            map: ringTexture,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.92
+          });
+          const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+          ringMesh.rotation.x = Math.PI / 2;
+          mesh.add(ringMesh);
+        }
+
+        // Uranus's Faint Vertical Ring
+        if (spec.hasFaintRing) {
+          const uRingGeo = new THREE.RingGeometry(spec.radius * 1.45, spec.radius * 1.78, 64);
+          const uRingMat = new THREE.MeshBasicMaterial({
+            color: 0xa5f3fc,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.25
+          });
+          const uRingMesh = new THREE.Mesh(uRingGeo, uRingMat);
+          uRingMesh.rotation.x = Math.PI / 2;
+          mesh.add(uRingMesh);
+        }
+
+        // Orbital Path Ring
+        let orbitLine = null;
+        if (spec.distance > 0) {
+          const curve = new THREE.EllipseCurve(0, 0, spec.distance, spec.distance, 0, Math.PI * 2, false, 0);
+          const pts = curve.getPoints(128).map(p => new THREE.Vector3(p.x, 0, p.y));
+          const orbitGeo = new THREE.BufferGeometry().setFromPoints(pts);
+          const orbitMat = new THREE.LineBasicMaterial({
+            color: isDark ? 0x38bdf8 : 0x4f46e5,
+            transparent: true,
+            opacity: isDark ? 0.22 : 0.26
+          });
+          orbitLine = new THREE.LineLoop(orbitGeo, orbitMat);
+          solarGroup.add(orbitLine);
+        }
+
+        // Floating Clickable Planet Label
+        const tag = document.createElement('button');
+        tag.type = 'button';
+        tag.className = 'planet-tag';
+        tag.textContent = spec.name;
+        tag.onclick = () => selectSolarBody(spec.key);
+        labelsLayer.appendChild(tag);
+        labelElements[spec.key] = tag;
+
+        solarBodies[spec.key] = {
+          spec,
+          orbitPivot,
+          bodyHolder,
+          mesh,
+          moonPivot,
+          galileanPivots,
+          orbitLine
+        };
+      });
+
+      // Main Asteroid Belt between Mars (14.5) and Jupiter (20.5)
+      const asteroidCount = 650;
+      const astPos = new Float32Array(asteroidCount * 3);
+      for (let i = 0; i < asteroidCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 16.5 + Math.random() * 2.2;
+        astPos[i * 3] = Math.cos(angle) * dist;
+        astPos[i * 3 + 1] = (Math.random() - 0.5) * 0.55;
+        astPos[i * 3 + 2] = Math.sin(angle) * dist;
+      }
+      const astGeo = new THREE.BufferGeometry();
+      astGeo.setAttribute('position', new THREE.BufferAttribute(astPos, 3));
+      asteroidBelt = new THREE.Points(astGeo, new THREE.PointsMaterial({
+        size: 0.11,
+        color: isDark ? 0x94a3b8 : 0x64748b,
+        transparent: true,
+        opacity: 0.65
       }));
-      scene.add(particlesMesh);
+      solarGroup.add(asteroidBelt);
 
-      updateResponsiveCorePosition();
+      setupCanvasRaycastClick(canvas);
+      updateSolarResponsiveOffset();
+    }
+
+    function updateSolarResponsiveOffset() {
+      if (!solarGroup) return;
+      if (window.innerWidth >= 1024) {
+        solarGroup.position.set(4.5, -0.5, 0);
+        if (activeBodyKey === 'overview' && controls) {
+          controls.target.set(1.5, -0.5, 0);
+        }
+      } else {
+        solarGroup.position.set(0, -1.5, 0);
+        if (activeBodyKey === 'overview' && controls) {
+          controls.target.set(0, -1.5, 0);
+        }
+      }
     }
 
     function updateThreeTheme(isDark) {
       if (!scene) return;
-      const p = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
-      scene.fog.color.setHex(p.fogColor);
-      pointLight1.color.setHex(p.light1);
-      pointLight2.color.setHex(p.light2);
-      innerCore.material.color.setHex(p.coreColor);
-      innerCore.material.emissive.setHex(p.coreEmissive);
-      innerCore.material.emissiveIntensity = isDark ? 0.36 : 0.18;
-      outerWireframe.material.color.setHex(p.wireColor);
-      outerWireframe.material.opacity = isDark ? 0.34 : 0.24;
-      ring1.material.color.setHex(p.ring1Color);
-      ring2.material.color.setHex(p.ring2Color);
-      ring3.material.color.setHex(p.ring3Color);
-      particlesMesh.material.color.setHex(p.particleColor);
-      particlesMesh.material.opacity = isDark ? 0.68 : 0.45;
-    }
-
-    function updateResponsiveCorePosition() {
-      if (!coreGroup) return;
-      if (window.innerWidth >= 1024) {
-        coreGroup.position.set(3.25, 0.2, 0);
-      } else {
-        coreGroup.position.set(0, 1.4, -1.6);
-      }
-    }
-
-    function setSculptureMode(mode) {
-      sculptureMode = mode;
-      const buttons = {
-        orbit: document.getElementById('btn-mode-orbit'),
-        pulse: document.getElementById('btn-mode-pulse'),
-        hyperspin: document.getElementById('btn-mode-hyperspin')
-      };
-
-      Object.entries(buttons).forEach(([key, btn]) => {
-        if (!btn) return;
-        if (key === mode) {
-          btn.className = 'sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 transition-all';
-        } else {
-          btn.className = 'sculpture-mode-btn py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-700 dark:bg-cyan-400/10 dark:hover:bg-cyan-400/20 dark:text-cyan-300 transition-all';
+      scene.fog.color.setHex(isDark ? 0x04060d : 0xeef2f9);
+      if (ambientLight) ambientLight.intensity = isDark ? 0.34 : 0.72;
+      Object.values(solarBodies).forEach(b => {
+        if (b.orbitLine) {
+          b.orbitLine.material.color.setHex(isDark ? 0x38bdf8 : 0x4f46e5);
+          b.orbitLine.material.opacity = isDark ? 0.22 : 0.26;
         }
       });
     }
 
-    function triggerKineticBurst() {
-      kineticBurst = 1.25;
+    // Raycasting for Direct 3D Planet Clicks
+    function setupCanvasRaycastClick(canvas) {
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let downX = 0, downY = 0;
+
+      canvas.addEventListener('pointerdown', (e) => {
+        downX = e.clientX;
+        downY = e.clientY;
+      });
+
+      canvas.addEventListener('pointerup', (e) => {
+        const moveDist = Math.hypot(e.clientX - downX, e.clientY - downY);
+        if (moveDist > 6) return; // Ignore orbit drags
+        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(clickableMeshes, false);
+        if (hits.length > 0 && hits[0].object.userData.bodyKey) {
+          selectSolarBody(hits[0].object.userData.bodyKey);
+        }
+      });
     }
 
-    const clock = new THREE.Clock();
+    // Smooth Camera Focus & Planet Telemetry Selector
+    function selectSolarBody(key) {
+      activeBodyKey = key;
+      isCameraTransitioning = true;
+
+      // Update active pill highlight
+      document.querySelectorAll('.planet-pill').forEach(btn => {
+        const isMatch = btn.getAttribute('data-body') === key;
+        if (isMatch) {
+          btn.className = 'planet-pill active flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white dark:bg-cyan-400 dark:text-slate-950 transition-all';
+        } else {
+          btn.className = 'planet-pill flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold opacity-80 hover:opacity-100 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all';
+        }
+      });
+
+      // Highlight 3D floating tag
+      Object.entries(labelElements).forEach(([k, tag]) => {
+        if (k === key) tag.classList.add('active');
+        else tag.classList.remove('active');
+      });
+
+      const telemetryCard = document.getElementById('planet-telemetry-card');
+
+      if (key === 'overview') {
+        telemetryCard.classList.add('hidden');
+        desiredCamOffset.set(16, 19, 34);
+        updateSolarResponsiveOffset();
+        return;
+      }
+
+      const body = solarBodies[key];
+      if (!body) return;
+
+      const worldPos = new THREE.Vector3();
+      body.bodyHolder.getWorldPosition(worldPos);
+      lastTrackedPos.copy(worldPos);
+
+      const d = body.spec.zoomDist;
+      desiredCamOffset.set(d * 0.85, d * 0.45, d * 0.95);
+
+      // Populate Telemetry Card
+      document.getElementById('telemetry-dot').style.backgroundColor = body.spec.colorHex;
+      document.getElementById('telemetry-type').textContent = body.spec.type;
+      document.getElementById('telemetry-name').textContent = body.spec.name;
+      document.getElementById('telemetry-desc').textContent = body.spec.desc;
+      document.getElementById('telemetry-distance').textContent = body.spec.distanceText;
+      document.getElementById('telemetry-period').textContent = body.spec.periodText;
+      document.getElementById('telemetry-radius').textContent = body.spec.radiusText;
+      document.getElementById('telemetry-temp-moons').textContent = body.spec.tempMoonsText;
+      telemetryCard.classList.remove('hidden');
+    }
+
+    function adjustZoom(factor) {
+      if (!camera || !controls) return;
+      isCameraTransitioning = false;
+      const offset = camera.position.clone().sub(controls.target);
+      const newLen = THREE.MathUtils.clamp(offset.length() * factor, controls.minDistance, controls.maxDistance);
+      offset.setLength(newLen);
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    }
+
+    function toggleOrbitSpeed() {
+      orbitsPaused = !orbitsPaused;
+      const btn = document.getElementById('btn-toggle-orbits');
+      if (btn) btn.textContent = orbitsPaused ? 'Resume Orbits' : 'Pause Orbits';
+    }
+
+    function toggleHeroFocus() {
+      heroFocusMode = !heroFocusMode;
+      const heroCopy = document.getElementById('hero-copy-block');
+      const btn = document.getElementById('btn-toggle-hud');
+      if (heroCopy) {
+        if (heroFocusMode) {
+          heroCopy.classList.add('opacity-10', 'pointer-events-none');
+          heroCopy.classList.remove('pointer-events-auto');
+        } else {
+          heroCopy.classList.remove('opacity-10', 'pointer-events-none');
+          heroCopy.classList.add('pointer-events-auto');
+        }
+      }
+      if (btn) btn.textContent = heroFocusMode ? 'Show Hero Info' : 'Full Space View';
+    }
+
+    const tempVec = new THREE.Vector3();
 
     function animate() {
       requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
 
-      mouseX += (targetMouseX - mouseX) * 0.05;
-      mouseY += (targetMouseY - mouseY) * 0.05;
-      kineticBurst *= 0.94;
+      // Update Planetary Orbits & Axial Rotations
+      Object.values(solarBodies).forEach(body => {
+        body.mesh.rotation.y += body.spec.rotSpeed;
+        if (!orbitsPaused && body.spec.orbitSpeed !== 0) {
+          body.orbitPivot.rotation.y += body.spec.orbitSpeed;
+        }
+        if (body.moonPivot && !orbitsPaused) {
+          body.moonPivot.rotation.y += 0.045;
+        }
+        if (body.galileanPivots && !orbitsPaused) {
+          body.galileanPivots.forEach(g => {
+            g.pivot.rotation.y += g.speed;
+          });
+        }
+      });
 
-      const spinMultiplier = sculptureMode === 'hyperspin' ? 3.2 : 1.0;
-
-      if (coreGroup) {
-        innerCore.rotation.y += (0.006 * spinMultiplier) + kineticBurst * 0.045;
-        innerCore.rotation.x += (0.003 * spinMultiplier) + kineticBurst * 0.025;
-
-        outerWireframe.rotation.y -= (0.0045 * spinMultiplier) + kineticBurst * 0.03;
-        outerWireframe.rotation.z += 0.002 * spinMultiplier;
-
-        ring1.rotation.z += (0.008 * spinMultiplier) + kineticBurst * 0.05;
-        ring2.rotation.x -= (0.0065 * spinMultiplier) + kineticBurst * 0.04;
-        ring3.rotation.y += (0.0055 * spinMultiplier) + kineticBurst * 0.035;
-
-        const scrollOffset = window.scrollY * 0.0014;
-        coreGroup.rotation.y = mouseX * 0.65 + scrollOffset;
-        coreGroup.rotation.x = mouseY * 0.45;
-
-        const baseScale = window.innerWidth >= 1024 ? 1.0 : 0.8;
-        const pulseWave = sculptureMode === 'pulse' ? Math.sin(elapsed * 4.2) * 0.08 : 0;
-        const finalScale = baseScale + pulseWave + kineticBurst * 0.14;
-        coreGroup.scale.set(finalScale, finalScale, finalScale);
+      if (asteroidBelt && !orbitsPaused) {
+        asteroidBelt.rotation.y += 0.0012;
       }
 
-      if (particlesMesh) {
-        particlesMesh.rotation.y = elapsed * 0.03 + mouseX * 0.15;
-        particlesMesh.rotation.x = mouseY * 0.1;
+      // Smooth Camera Tracking for Selected Planet
+      if (activeBodyKey !== 'overview' && solarBodies[activeBodyKey]) {
+        const currentWorldPos = new THREE.Vector3();
+        solarBodies[activeBodyKey].bodyHolder.getWorldPosition(currentWorldPos);
+
+        const deltaMove = currentWorldPos.clone().sub(lastTrackedPos);
+        camera.position.add(deltaMove);
+        controls.target.add(deltaMove);
+        lastTrackedPos.copy(currentWorldPos);
+
+        if (isCameraTransitioning) {
+          const targetCamPos = currentWorldPos.clone().add(desiredCamOffset);
+          camera.position.lerp(targetCamPos, 0.07);
+          controls.target.lerp(currentWorldPos, 0.09);
+          if (camera.position.distanceTo(targetCamPos) < 0.08) {
+            isCameraTransitioning = false;
+          }
+        }
+      } else if (isCameraTransitioning && activeBodyKey === 'overview') {
+        const defaultTarget = window.innerWidth >= 1024 ? new THREE.Vector3(1.5, -0.5, 0) : new THREE.Vector3(0, -1.5, 0);
+        const defaultCam = defaultTarget.clone().add(desiredCamOffset);
+        camera.position.lerp(defaultCam, 0.07);
+        controls.target.lerp(defaultTarget, 0.08);
+        if (camera.position.distanceTo(defaultCam) < 0.1) {
+          isCameraTransitioning = false;
+        }
       }
 
+      controls.update();
       renderer.render(scene, camera);
+
+      // Update Projected 2D Screen Positions for Floating Planet Tags
+      const showLabels = window.scrollY < window.innerHeight * 0.72;
+      const labelsLayer = document.getElementById('planet-labels-layer');
+      if (labelsLayer) labelsLayer.style.opacity = showLabels ? '1' : '0';
+
+      if (showLabels) {
+        Object.entries(solarBodies).forEach(([key, body]) => {
+          const tag = labelElements[key];
+          if (!tag) return;
+          body.bodyHolder.getWorldPosition(tempVec);
+          tempVec.y += body.spec.radius + 0.35;
+          tempVec.project(camera);
+
+          if (tempVec.z > 1) {
+            tag.style.display = 'none';
+          } else {
+            const x = (tempVec.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-tempVec.y * 0.5 + 0.5) * window.innerHeight;
+            tag.style.display = 'block';
+            tag.style.left = `${x}px`;
+            tag.style.top = `${y}px`;
+          }
+        });
+      }
     }
 
     // =========================================================================
     // 6. THEME SWITCHER, SCROLL REVEAL & FORM SUBMISSION
     // =========================================================================
     const themeToggleBtn = document.getElementById('theme-toggle');
-    const themeBadgeLabel = document.getElementById('theme-badge-label');
 
     function setTheme(mode) {
       const htmlEl = document.documentElement;
       const isDark = mode === 'dark';
       if (isDark) {
         htmlEl.classList.add('dark');
-        if (themeBadgeLabel) themeBadgeLabel.textContent = 'Obsidian Cyber';
       } else {
         htmlEl.classList.remove('dark');
-        if (themeBadgeLabel) themeBadgeLabel.textContent = 'Alabaster Prism';
       }
       localStorage.setItem('idemo-theme', mode);
       updateThreeTheme(isDark);
@@ -1673,8 +2342,6 @@
 
     const cursorGlow = document.getElementById('cursor-glow');
     window.addEventListener('mousemove', (e) => {
-      targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      targetMouseY = (e.clientY / window.innerHeight) * 2 - 1;
       if (cursorGlow) {
         cursorGlow.style.left = `${e.clientX}px`;
         cursorGlow.style.top = `${e.clientY}px`;
@@ -1686,7 +2353,7 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      updateResponsiveCorePosition();
+      updateSolarResponsiveOffset();
     });
 
     const revealObserver = new IntersectionObserver((entries) => {
@@ -1704,14 +2371,13 @@
       e.preventDefault();
       formFeedback.classList.remove('hidden');
       contactForm.reset();
-      triggerKineticBurst();
       showToast('Message recorded for Apurba Mondal (@mapurba)');
       setTimeout(() => formFeedback.classList.add('hidden'), 6500);
     });
 
     window.onload = function () {
       renderProjects();
-      initThreeScene();
+      initSolarSystem();
       animate();
     };
   </script>
